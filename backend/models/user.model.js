@@ -1,0 +1,29 @@
+import { uniqueIndex,check, pgEnum ,integer, timestamp} from 'drizzle-orm/pg-core'
+import { serial, varchar } from 'drizzle-orm/pg-core'
+import {pgTable} from 'drizzle-orm/pg-core'
+
+import {sql} from 'drizzle-orm'
+
+export const roleEnum = pgEnum('role',["admin","member"])
+export const providerEnum = pgEnum('provider',["github","google"])
+
+export const users =  pgTable("users",{
+    id:serial('id').primaryKey(),
+    username:varchar('username',{length:32}).notNull().unique(),
+    email:varchar('email',{length:255}).notNull().unique(),
+    password:varchar('password',{length:8}).notNull(),
+    createdAt:timestamp("created_at").notNull().defaultNow()
+},(users)=>[
+    uniqueIndex('unique_user').on(users.email),
+    check('email_regex',sql`${users.email}~'^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$'`)
+])
+
+
+export const oauthAccount = pgTable("oauth_account",{
+    id:serial('id').primaryKey(),
+    userId:integer('user_id').notNull().references(()=>users.id,{onDelete:'cascade'}),
+    provider:providerEnum('provider').notNull(),
+    providerAccountId : varchar("provider_account_id").notNull().unique(),
+    createdAt:timestamp("created_at").notNull().defaultNow()
+
+})
