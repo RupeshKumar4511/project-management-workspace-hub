@@ -11,7 +11,7 @@ export const users =  pgTable("users",{
     id:serial('id').primaryKey(),
     username:varchar('username',{length:32}).notNull().unique(),
     email:varchar('email',{length:255}).notNull().unique(),
-    password:varchar('password',{length:8}).notNull(),
+    password:varchar('password',{length:32}).notNull(),
     createdAt:timestamp("created_at").notNull().defaultNow()
 },(users)=>[
     uniqueIndex('unique_user').on(users.email),
@@ -23,7 +23,15 @@ export const oauthAccount = pgTable("oauth_account",{
     id:serial('id').primaryKey(),
     userId:integer('user_id').notNull().references(()=>users.id,{onDelete:'cascade'}),
     provider:providerEnum('provider').notNull(),
-    providerAccountId : varchar("provider_account_id").notNull().unique(),
+    providerAccountId : varchar("provider_account_id",{length:255}).notNull().unique(),
     createdAt:timestamp("created_at").notNull().defaultNow()
 
+})
+
+export const tokens = pgTable("tokens",{
+    id:serial("id").primaryKey(),
+    userId:integer("user_id").notNull().references(()=>users.id,{onDelete:'cascade'}),
+    refreshToken:varchar("refresh_token").notNull(),
+    createdAt:timestamp("created_at").defaultNow().notNull(),
+    expiredAt:timestamp("expired_at").notNull()
 })
