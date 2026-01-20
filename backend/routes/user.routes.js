@@ -10,3 +10,4 @@ const router = express.Router();
 router.route('/login').post(checkSchema(loginSchema),userValidation,login)
 router.route('/signup').post(checkSchema(signUpSchema),userValidation,signUp)
 router.route('/refresh').post(generateNewRefreshToken)
+router.route('/logout').post(logOut)
