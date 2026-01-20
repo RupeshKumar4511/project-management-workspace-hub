@@ -1,5 +1,5 @@
 import express from 'express';
-import {generateNewRefreshToken, login,signUp} from '../controllers/user.controller.js'
+import {generateNewRefreshToken, login,logOut,signUp} from '../controllers/user.controller.js'
 import {loginSchema,signUpSchema} from '../utils/user.validationSchema.js'
 import { checkSchema } from 'express-validator';
 import { userValidation } from '../middleware/user.validation.js';
