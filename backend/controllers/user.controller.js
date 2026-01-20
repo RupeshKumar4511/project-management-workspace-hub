@@ -79,7 +79,7 @@ export const login = async (req, res) => {
 
         const expiresAt = new Date(Date.now() + 1000 * 60 * 60 * 24 * 7);
 
-        await db.insert(tokens).values({ id: user.id, accessToken, refreshToken, expiredAt: expiresAt })
+        await db.insert(tokens).values({ userId: user.id, refreshToken, expiredAt: expiresAt })
 
         res.cookie("accessToken", accessToken, options)
         res.cookie("refreshToken", refreshToken, options)
@@ -120,7 +120,7 @@ export const generateNewRefreshToken = async (req, res) => {
 
         await db.update(tokens).set({ refreshToken: newRefreshToken }).where(eq(token, dbToken.refreshToken))
 
-        res.cookie("access_token", accessToken)
+        res.cookie("accessToken", accessToken)
         res.cookie("refreshToken", newRefreshToken)
         res.status(204)
 
