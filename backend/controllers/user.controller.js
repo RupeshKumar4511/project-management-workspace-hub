@@ -1,16 +1,16 @@
 import { db } from '../config/db.js';
-import { users,tokens } from '../models/user.model.js'
+import { users, tokens } from '../models/user.model.js'
 import jwt from 'jsonwebtoken'
 import bcrypt from 'bcrypt'
 import { or } from 'drizzle-orm';
-import {config} from 'dotenv'
+import { config } from 'dotenv'
 config()
 
 // generate accessToken and refresh Tokens
 export const generateAccessToken = async (user) => {
     return jwt.sign({
+        id: user.id,
         username: user.usename,
-        email:user.email
     }, process.env.JWT_SECRET, {
         expiresIn: '15m'
     })
@@ -22,7 +22,7 @@ export const generateRefreshToken = (user) => {
         {
             id: user.id,
             username: user.username,
-            email:user.email
+            email: user.email
         },
         process.env.JWT_SECRET,
         { expiresIn: '7d' }
@@ -35,7 +35,7 @@ export const signUp = async (req, res) => {
     const { username, email, password } = req.body;
 
     try {
-        const user = await db.select().from(users).where(or(eq(users.username, username), eq(email, users.email)))
+        const [user] = await db.select().from(users).where(or(eq(users.username, username), eq(email, users.email)))
 
         if (user) {
             return res.status(409).send({ message: "User already exists." })
@@ -56,7 +56,7 @@ export const login = async (req, res) => {
     const errorMsg = { success: false, message: "Username or Password is Wrong" };
 
     try {
-        const user = await db.select().from(users).where(or(eq(users.username, username), eq(users.email, username)))
+        const [user] = await db.select().from(users).where(or(eq(users.username, username), eq(users.email, username)))
 
         if (!user) {
             return res.status(404).send(errorMsg)
@@ -105,7 +105,7 @@ export const generateNewRefreshToken = async (req, res) => {
     try {
 
         const decodedData = jwt.verify(token, process.env.JWT_SECRET)
-        const dbToken = await db.select().from(tokens).where(eq(tokens.id, users.userId))
+        const [dbToken] = await db.select().from(tokens).where(eq(tokens.id, users.userId))
 
         if (!dbToken) {
             return res.status(403).send({ message: "Invalid Refresh token" })
@@ -125,6 +125,44 @@ export const generateNewRefreshToken = async (req, res) => {
         res.status(204)
 
     } catch (error) {
-
+        return res.status(401).send({ success: false, message: "Invalid or Expired Token" });
     }
+}
+
+// logOut Controller
+export const logOut = async (req, res) => {
+    const { accessToken, refreshToken } = req.body;
+
+    if (!accessToken && !refreshToken) {
+        return res.status(401).send({ success: false, message: "Unauthorized Request." })
+    }
+
+    try {
+
+        const tokenToVerify = refreshToken || accessToken;
+
+        const decodedData = jwt.verify(tokenToVerify, process.env.JWT_SECRET)
+
+        const [dbToken] = await db.select().from(tokens).where(eq(tokenToVerify.id, decodedData.id))
+
+        if (!dbToken) {
+            return res.status(403).send({ message: "Invalid Refresh token" })
+        }
+
+        if (refreshToken && dbToken.refreshToken !== refreshToken) {
+            return res.status(403).send({ message: "your refresh token is expired or used" })
+        }
+
+        await db.delete(tokens).where(eq(tokens.userId, decodedData.id));
+
+        res.clearCookie("accessToken")
+        res.clearCookie("refreshToken")
+
+        return res.status(200).send({ success: true, message: "Logout Successfully." })
+
+
+    } catch (error) {
+        return res.status(401).send({ success: false, message: "Invalid or Expired Token" });
+    }
+
 }
