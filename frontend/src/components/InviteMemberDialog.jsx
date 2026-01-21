@@ -8,6 +8,7 @@ const InviteMemberDialog = ({ isDialogOpen, setIsDialogOpen }) => {
     const [isSubmitting, setIsSubmitting] = useState(false);
     const [formData, setFormData] = useState({
         email: "",
+        password:"",
         role: "org:member",
     });
 
@@ -43,6 +44,16 @@ const InviteMemberDialog = ({ isDialogOpen, setIsDialogOpen }) => {
                         <div className="relative">
                             <Mail className="absolute left-3 top-1/2 -translate-y-1/2 text-zinc-500 dark:text-zinc-400 w-4 h-4" />
                             <input type="email" value={formData.email} onChange={(e) => setFormData({ ...formData, email: e.target.value })} placeholder="Enter email address" className="pl-10 mt-1 w-full rounded border border-zinc-300 dark:border-zinc-700 dark:bg-zinc-900 text-zinc-900 dark:text-zinc-200 text-sm placeholder-zinc-400 dark:placeholder-zinc-500 py-2 focus:outline-none focus:border-blue-500" required />
+                        </div>
+                    </div>
+
+                     {/* Password */}
+                    <div className="space-y-2">
+                        <label htmlFor="text" className="text-sm font-medium text-zinc-900 dark:text-zinc-200">
+                            Password
+                        </label>
+                        <div className="relative">
+                            <input type="text" value={formData.password} onChange={(e) => setFormData({ ...formData, password: e.target.value })} placeholder="Set password for team member" className="pl-10 mt-1 w-full rounded border border-zinc-300 dark:border-zinc-700 dark:bg-zinc-900 text-zinc-900 dark:text-zinc-200 text-sm placeholder-zinc-400 dark:placeholder-zinc-500 py-2 focus:outline-none focus:border-blue-500" required />
                         </div>
                     </div>
 
