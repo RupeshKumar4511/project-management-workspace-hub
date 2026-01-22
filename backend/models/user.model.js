@@ -12,6 +12,7 @@ export const users =  pgTable("users",{
     username:varchar('username',{length:32}).notNull().unique(),
     email:varchar('email',{length:255}).notNull().unique(),
     password:varchar('password',{length:32}).notNull(),
+    role:roleEnum('role').default('member').notNull(),
     createdAt:timestamp("created_at").notNull().defaultNow()
 },(users)=>[
     uniqueIndex('unique_user').on(users.email),
