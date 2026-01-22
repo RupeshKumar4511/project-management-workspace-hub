@@ -1,5 +1,6 @@
 import { db } from '../config/db.js';
 import { users, tokens } from '../models/user.model.js'
+import otpModel from '../models/otp.model.js'
 import jwt from 'jsonwebtoken'
 import bcrypt from 'bcrypt'
 import { or } from 'drizzle-orm';
@@ -165,4 +166,38 @@ export const logOut = async (req, res) => {
         return res.status(401).send({ success: false, message: "Invalid or Expired Token" });
     }
 
+}
+
+export const verifyEmail = async(req,res,next)=>{
+    const {emailId,otp} = req.body;
+
+    const [data] = db.select({emailId,otp}).from(otpModel).where(eq(emailId,otp.emailId)).orderBy(otpModel.createdBy).limit(1)
+
+    if(!data){
+        res.status(400).send({success:false,message:"Incorrect Email"})
+    }
+
+    if(data.otp !== otp){
+        res.status(400).send({success:false,message:"Incorrect OTP"})
+    }
+
+    return res.status(200)
+    // return next()
+
+
+}
+
+export const resetPassword = async(req,res)=>{
+    const {email,password} = req.body;
+
+    const [user] = db.select({email}).from(users).where(eq(users.email,email));
+
+    if(!user){
+        return res.status(401).send({success:false,message:"Unauthorized Request."})
+    }
+
+    await db.update(users).set({password}).where(eq(users.email,email))
+
+    return res.status(200).send({success:true,message:"Password reset Successfully"})
+    
 }
