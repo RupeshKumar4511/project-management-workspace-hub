@@ -1,8 +1,9 @@
 import { uniqueIndex,check, pgEnum ,integer, timestamp} from 'drizzle-orm/pg-core'
-import { serial, varchar } from 'drizzle-orm/pg-core'
+import { serial, varchar,text } from 'drizzle-orm/pg-core'
 import {pgTable} from 'drizzle-orm/pg-core'
 
 import {sql} from 'drizzle-orm'
+
 
 export const roleEnum = pgEnum('role',["admin","member"])
 export const providerEnum = pgEnum('provider',["github","google"])
@@ -11,7 +12,7 @@ export const users =  pgTable("users",{
     id:serial('id').primaryKey(),
     username:varchar('username',{length:32}).notNull().unique(),
     email:varchar('email',{length:255}).notNull().unique(),
-    password:varchar('password',{length:32}).notNull(),
+    password:text('password').notNull(),
     role:roleEnum('role').default('member').notNull(),
     createdAt:timestamp("created_at").notNull().defaultNow()
 },(users)=>[
