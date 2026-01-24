@@ -9,6 +9,8 @@ Redux Toolkit
 Tailwind CSS
 <br>
 Node.js + Express.js
+<br>
+PostgreSQL
 
 
 # Frontend Reference : 
