@@ -87,9 +87,9 @@ export const sendMail2 = createAsyncThunk('auth/sendMail2', async (userData,thun
     }
 })
 
-export const verifyEmail = createAsyncThunk('auth/verifyEmail', async (userData,thunkAPI) => {
+export const verifyUser = createAsyncThunk('auth/verifyUser', async (userData,thunkAPI) => {
     try {
-        const response = await fetch('http://localhost:3000/api/v1/users/verify-email', {
+        const response = await fetch('http://localhost:3000/api/v1/users/verify-user', {
             method: "POST",
             headers: { "Content-Type": 'application/json' },
             body: JSON.stringify(userData)
@@ -132,7 +132,7 @@ const authSlice = createSlice({
         response: {},// for signup
         sendEmailResponse: {},
         sendEmail2Response:{},
-        verifyEmailResponse: {},
+        verifyUserResponse: {},
         resetPasswordResponse: {},
         authResponse: parsedUser,
         tempAuthResponse: {},
@@ -142,7 +142,7 @@ const authSlice = createSlice({
             logoutError: "",
             sendMailError: "",
             sendMail2Error:"",
-            verifyEmailError: "",
+            verifyUserError: "",
             resetPasswordError: "",
         }
 
@@ -231,17 +231,17 @@ const authSlice = createSlice({
                 state.error.sendMail2Error = action.payload || action.error.message || "Something went wrong.";
 
             })
-            .addCase(verifyEmail.pending, (state) => {
+            .addCase(verifyUser.pending, (state) => {
                 state.isLoading = true;
             })
-            .addCase(verifyEmail.fulfilled, (state, action) => {
+            .addCase(verifyUser.fulfilled, (state, action) => {
                 state.isLoading = false;
-                state.error.verifyEmailError = '';
-                state.verifyEmailResponse = action.payload
+                state.error.verifyUserError = '';
+                state.verifyUserResponse = action.payload
             })
-            .addCase(verifyEmail.rejected, (state, action) => {
+            .addCase(verifyUser.rejected, (state, action) => {
                 state.isLoading = false;
-                state.error.verifyEmailError = action.payload || action.error.message || "Something went wrong.";
+                state.error.verifyUserError = action.payload || action.error.message || "Something went wrong.";
 
             })
             .addCase(resetPassword.pending, (state) => {
