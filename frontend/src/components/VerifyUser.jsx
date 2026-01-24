@@ -1,7 +1,7 @@
 import { useEffect, useRef, useState } from 'react';
 import { useForm } from "react-hook-form";
 import { Link, useLocation, useNavigate } from 'react-router-dom';
-import { verifyEmail } from '../features/authSlice';
+import { verifyUser } from '../features/authSlice';
 import { useDispatch, useSelector } from 'react-redux';
 import LoadingSpinner from './LoadingSpinner';
 
@@ -12,25 +12,25 @@ export default function VerifyUser() {
   const [timeLeft, setTimeLeft] = useState('5:00');
   const navigate = useNavigate()
   const dispatch = useDispatch()
-  const { verifyEmailResponse, isLoading, error } = useSelector(store => store.auth);
+  const { verifyUserResponse, isLoading, error } = useSelector(store => store.auth);
   const [otp, setOtp] = useState('');
   const { register, handleSubmit, formState: { errors } } = useForm()
 
   const onSubmit = (data) => {
     setOtp(data.otp);
-    dispatch(verifyEmail({ ...data, ...state }))
+    dispatch(verifyUser({ ...data, ...state }))
   }
 
 
 
   useEffect(() => {
-    if (verifyEmailResponse.success === true) {
+    if (verifyUserResponse.success === true) {
       navigate("/reset-password", {
         state: { ...state, otp }
       });
     }
 
-  }, [verifyEmailResponse, navigate])
+  }, [verifyUserResponse, navigate])
 
 
 
@@ -72,8 +72,8 @@ export default function VerifyUser() {
 
       onSubmit={handleSubmit(onSubmit)}
     >
-      <p className={`text-red-500 ${verifyEmailResponse.success ? 'hidden' : ''}`}>{!verifyEmailResponse.success ? verifyEmailResponse.message : ''}</p>
-      <p className={`text-red-500 ${error.verifyEmailError ? '' : 'hidden'}`}>{error.verifyEmailError ? error.verifyEmailError : ''}</p>
+      <p className={`text-red-500 ${verifyUserResponse.success ? 'hidden' : ''}`}>{!verifyUserResponse.success ? verifyUserResponse.message : ''}</p>
+      <p className={`text-red-500 ${error.verifyUserError ? '' : 'hidden'}`}>{error.verifyUserError ? error.verifyUserError : ''}</p>
       <div className="mb-4 flex flex-col justify-between relative">
         <label htmlFor="title" className="text-sm md:text-lg mb-1 md:mb-0 md:mr-2">
           Enter the OTP sent to your email :
