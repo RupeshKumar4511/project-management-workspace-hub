@@ -24,7 +24,7 @@ export default function Login({ setOpen }) {
  
   useEffect(()=>{
       if (authResponse.success === true) {
-      navigate("/user");
+      navigate("/app");
     }
     },[authResponse,navigate])
 
