@@ -155,7 +155,11 @@ const authSlice = createSlice({
         updateSendMail2Response:(state)=>{
             state.sendEmail2Response="";
             state.error.sendMail2Error="";
-        }
+        },
+        updateResetPasswordResponse:(state)=>{
+            state.resetPasswordResponse="";
+            state.error.resetPasswordError="";
+        },
     },
     extraReducers: (builder => {
         builder.addCase(signUp.pending, (state) => {
