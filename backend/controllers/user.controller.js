@@ -136,7 +136,7 @@ export const generateNewRefreshToken = async (req, res) => {
 
 // logOut Controller
 export const logOut = async (req, res) => {
-    const { accessToken, refreshToken } = req.body;
+    const { accessToken, refreshToken } = req.cookies;
 
     if (!accessToken && !refreshToken) {
         return res.status(401).send({ success: false, message: "Unauthorized Request." })
@@ -148,7 +148,7 @@ export const logOut = async (req, res) => {
 
         const decodedData = jwt.verify(tokenToVerify, process.env.JWT_SECRET)
 
-        const [dbToken] = await db.select().from(tokens).where(eq(tokenToVerify.id, decodedData.id))
+        const [dbToken] = await db.select().from(tokens).where(eq(tokens.userId, decodedData.id))
 
         if (!dbToken) {
             return res.status(403).send({ message: "Invalid Refresh token" })
@@ -163,7 +163,7 @@ export const logOut = async (req, res) => {
         res.clearCookie("accessToken")
         res.clearCookie("refreshToken")
 
-        return res.status(200).send({ success: true, message: "Logout Successfully." })
+        return res.status(200).send({ logout: true, message: "Logout Successfully." })
 
 
     } catch (error) {
@@ -190,13 +190,13 @@ export const verifyUser = async(req,res)=>{
 export const resetPassword = async(req,res)=>{
     const {email,password} = req.body;
 
-    const [user] = await db.select({email}).from(users).where(eq(users.email,email));
+    const [user] = await db.select({email:users.email}).from(users).where(eq(users.email,email));
 
     if(!user){
         return res.status(401).send({success:false,message:"Unauthorized Request."})
     }
-
-    await db.update(users).set({password}).where(eq(users.email,email))
+    const hashedPassword = await bcrypt.hash(password,10)
+    await db.update(users).set({password:hashedPassword}).where(eq(users.email,email))
 
     return res.status(200).send({success:true,message:"Password reset Successfully"})
     
