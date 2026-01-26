@@ -36,7 +36,7 @@ const verifyEmail = async (req, res, next) => {
 
     await db.delete(otpModel).where(eq(otpModel.emailId, email));
 
-    return next()
+    next()
 
 
 }
