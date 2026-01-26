@@ -13,6 +13,14 @@ import Home from './components/Home.jsx'
 import ResetPassword from './components/ResetPassword.jsx'
 import { StrictMode } from 'react'
 import WorkspaceHub from './components/WorkspaceHub.jsx'
+import Projects from './pages/Projects.jsx'
+import Team from './pages/Team.jsx'
+import ProjectDetails from "./pages/ProjectDetails";
+import TaskDetails from "./pages/TaskDetails";
+import Dashboard from './pages/Dashboard.jsx'
+import WorkspaceList from './components/WorkspaceList.jsx'
+import CreateWorkspaceForm from './components/CreateWorkspaceForm.jsx'
+import Profile from './components/Profile.jsx'
 
 const router = createBrowserRouter([
 
@@ -29,13 +37,24 @@ const router = createBrowserRouter([
   },
   {
     path: '/app', element: <WorkspaceHub />,
-    errorElement: <ErrorPage />
+    errorElement: <ErrorPage />,
+    children: [
+      { path: '/app', element: <WorkspaceList /> },
+      { path: '/app/create-workspace', element: <CreateWorkspaceForm /> },
+      { path: '/app/profile', element: <Profile /> },
+    ]
   },
   {
-    path: '/workspace', element: <App />,
-    errorElement: <ErrorPage />
-  },
-
+    path: '/app/workspace', element: <App />,
+    errorElement: <ErrorPage />,
+    children: [
+      { index:true, element: <Dashboard /> },
+      { path: '/app/workspace/team', element: <Team /> },
+      { path: '/app/workspace/projects', element: <Projects /> },
+      { path: '/app/workspace/projectsDetail', element: <ProjectDetails /> },
+      { path: '/app/workspace/taskDetails', element: <TaskDetails /> },
+    ]
+  }
 
 ])
 createRoot(document.getElementById('root')).render(
