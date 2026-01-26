@@ -28,17 +28,18 @@ export const loginSchema = {
             },
             errorMsg: "password must be atleast 8-32 characters long."
         },
-        matches:{
-            options:/^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?&])[A-Za-z\d@$!%*?&]{8,}$/,
-            errorMsg:"password is not valid"
+        matches: {
+            options: [/^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?&])[A-Za-z\d@$!%*?&]{8,}$/],
+            errorMsg: "Password must contain uppercase, lowercase, number & special character"
         }
+
     }
 }
 
 export const signUpSchema = {
-    otp:{
-        notEmpty:{
-            errorMsg:"OTP is required"
+    otp: {
+        notEmpty: {
+            errorMsg: "OTP is required"
         },
         isString: {
             errorMsg: "OTP must be string."
@@ -80,9 +81,9 @@ export const signUpSchema = {
             },
             errorMsg: "email must be atleast 8-255 characters long."
         },
-        matches:{
-            options:[/^[^\s@]+@[^\s@]+\.[^\s@]+$/],
-            errorMsg:"email is not valid."
+        matches: {
+            options: [/^[^\s@]+@[^\s@]+\.[^\s@]+$/],
+            errorMsg: "email is not valid."
         }
     },
     password: {
@@ -98,14 +99,19 @@ export const signUpSchema = {
                 max: 32
             },
             errorMsg: "password must be atleast 8-32 characters long."
+        },
+        matches: {
+            options: [/^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?&])[A-Za-z\d@$!%*?&]{8,}$/],
+            errorMsg: "Password must contain uppercase, lowercase, number & special character"
         }
+
     }
 }
 
 export const resetPasswordSchema = {
-    otp:{
-        notEmpty:{
-            errorMsg:"OTP is required"
+    otp: {
+        notEmpty: {
+            errorMsg: "OTP is required"
         },
         isString: {
             errorMsg: "OTP must be string."
@@ -118,12 +124,12 @@ export const resetPasswordSchema = {
             errorMsg: "OTP must be 6 characters long."
         },
     },
-    email:{
-        notEmpty:{
-            errorMsg:"email is required"
+    email: {
+        notEmpty: {
+            errorMsg: "email is required"
         },
-        isString:{
-            errorMsg:"email must be string"
+        isString: {
+            errorMsg: "email must be string"
         },
         isLength: {
             options: {
@@ -147,21 +153,22 @@ export const resetPasswordSchema = {
             },
             errorMsg: "password must be atleast 8-32 characters long."
         },
-        matches:{
-            options:[/^[^\s@]+@[^\s@]+\.[^\s@]+$/],
-            errorMsg:"email is not valid."
+        matches: {
+            options: [/^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?&])[A-Za-z\d@$!%*?&]{8,}$/],
+            errorMsg: "Password must contain uppercase, lowercase, number & special character"
         }
+
     }
-} 
+}
 
 
 export const verifyUserSchema = {
-    email:{
-        notEmpty:{
-            errorMsg:"email is required"
+    email: {
+        notEmpty: {
+            errorMsg: "email is required"
         },
-        isString:{
-            errorMsg:"email must be string"
+        isString: {
+            errorMsg: "email must be string"
         },
         isLength: {
             options: {
@@ -170,14 +177,14 @@ export const verifyUserSchema = {
             },
             errorMsg: "email must be atleast 8-255 characters long."
         },
-        matches:{
-            options:[/^[^\s@]+@[^\s@]+\.[^\s@]+$/],
-            errorMsg:"email is not valid."
+        matches: {
+            options: [/^[^\s@]+@[^\s@]+\.[^\s@]+$/],
+            errorMsg: "email is not valid."
         }
     },
-    otp:{
-        notEmpty:{
-            errorMsg:"OTP is required"
+    otp: {
+        notEmpty: {
+            errorMsg: "OTP is required"
         },
         isString: {
             errorMsg: "OTP must be string."
