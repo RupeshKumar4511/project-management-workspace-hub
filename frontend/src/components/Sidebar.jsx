@@ -8,9 +8,9 @@ import { FolderOpenIcon, LayoutDashboardIcon, SettingsIcon, UsersIcon } from 'lu
 const Sidebar = ({ isSidebarOpen, setIsSidebarOpen }) => {
 
     const menuItems = [
-        { name: 'Dashboard', href: '/', icon: LayoutDashboardIcon },
-        { name: 'Projects', href: '/projects', icon: FolderOpenIcon },
-        { name: 'Team', href: '/team', icon: UsersIcon },
+        { name: 'Dashboard', href: '/app/workspace', icon: LayoutDashboardIcon },
+        { name: 'Projects', href: '/app/workspace/projects', icon: FolderOpenIcon },
+        { name: 'Team', href: '/app/workspace/team', icon: UsersIcon },
     ]
 
     const sidebarRef = useRef(null);
@@ -33,7 +33,7 @@ const Sidebar = ({ isSidebarOpen, setIsSidebarOpen }) => {
                 <div>
                     <div className='p-4'>
                         {menuItems.map((item) => (
-                            <NavLink to={item.href} key={item.name} className={({ isActive }) => `flex items-center gap-3 py-2 px-4 text-gray-800 dark:text-zinc-100 cursor-pointer rounded transition-all  ${isActive ? 'bg-gray-100 dark:bg-zinc-900 dark:bg-gradient-to-br dark:from-zinc-800 dark:to-zinc-800/50  dark:ring-zinc-800' : 'hover:bg-gray-50 dark:hover:bg-zinc-800/60'}`} >
+                            <NavLink to={item.href} end={item.href === '/app/workspace'} key={item.name} className={({ isActive }) => `flex items-center gap-3 py-2 px-4 text-gray-800 dark:text-zinc-100 cursor-pointer rounded transition-all  ${isActive ? 'bg-gray-100 dark:bg-zinc-900 dark:bg-gradient-to-br dark:from-zinc-800 dark:to-zinc-800/50  dark:ring-zinc-800' : 'hover:bg-gray-50 dark:hover:bg-zinc-800/60'}`} >
                                 <item.icon size={16} />
                                 <p className='text-sm truncate'>{item.name}</p>
                             </NavLink>
@@ -46,6 +46,8 @@ const Sidebar = ({ isSidebarOpen, setIsSidebarOpen }) => {
                     <MyTasksSidebar />
                     <ProjectSidebar />
                 </div>
+
+                <NavLink className="mx-5 my-4 text-xs font-medium text-gray-500 dark:text-zinc-400 uppercase tracking-wider">Ask to AI</NavLink>
 
 
             </div>

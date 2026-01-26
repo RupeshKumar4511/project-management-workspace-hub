@@ -22,7 +22,7 @@ export default function CreateWorkspaceForm() {
 
 
                 <div>
-                    <label className="text-sm text-gray-600">Created By</label>
+                    <label className="text-sm text-gray-600">Admin Name</label>
                     <input
                         type="text"
                         placeholder="Your name"
@@ -42,10 +42,10 @@ export default function CreateWorkspaceForm() {
 
 
                 <div className="md:col-span-2">
-                    <label className="text-sm text-gray-600">Workspace Password</label>
+                    <label className="text-sm text-gray-600">Admin Password</label>
                     <input
                         type="password"
-                        placeholder="Set a secure password"
+                        placeholder="Set a secure password for admin"
                         className="mt-1 w-full rounded-xl border border-gray-300 px-4 py-3 focus:outline-none focus:ring-2 focus:ring-indigo-400"
                     />
                 </div>

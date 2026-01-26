@@ -17,9 +17,11 @@ const Reset = () => {
   }
 
     if (sendEmail2Response.success === true) {
-      navigate("/verify-user", {
+      setTimeout(()=>{
+        navigate("/verify-user", {
         state: getValues()
       });
+      },1000)
     }
 
 

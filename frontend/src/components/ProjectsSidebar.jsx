@@ -15,10 +15,10 @@ const ProjectSidebar = () => {
     );
 
     const getProjectSubItems = (projectId) => [
-        { title: 'Tasks', icon: KanbanIcon, url: `/projectsDetail?id=${projectId}&tab=tasks` },
-        { title: 'Analytics', icon: ChartColumnIcon, url: `/projectsDetail?id=${projectId}&tab=analytics` },
-        { title: 'Calendar', icon: CalendarIcon, url: `/projectsDetail?id=${projectId}&tab=calendar` },
-        { title: 'Settings', icon: SettingsIcon, url: `/projectsDetail?id=${projectId}&tab=settings` }
+        { title: 'Tasks', icon: KanbanIcon, url: `/app/workspace/projectsDetail?id=${projectId}&tab=tasks` },
+        { title: 'Analytics', icon: ChartColumnIcon, url: `/app/workspace/projectsDetail?id=${projectId}&tab=analytics` },
+        { title: 'Calendar', icon: CalendarIcon, url: `/app/workspace/projectsDetail?id=${projectId}&tab=calendar` },
+        { title: 'Settings', icon: SettingsIcon, url: `/app/workspace/projectsDetail?id=${projectId}&tab=settings` }
     ];
 
     const toggleProject = (id) => {
@@ -33,7 +33,7 @@ const ProjectSidebar = () => {
                 <h3 className="text-xs font-medium text-gray-500 dark:text-zinc-400 uppercase tracking-wider">
                     Projects
                 </h3>
-                <Link to="/projects">
+                <Link to="/app/workspace/projects">
                     <button className="size-5 text-gray-500 dark:text-zinc-400 hover:text-gray-900 dark:hover:text-white hover:bg-gray-100 dark:hover:bg-zinc-800 rounded flex items-center justify-center transition-colors duration-200">
                         <ArrowRightIcon className="size-3" />
                     </button>
@@ -54,7 +54,7 @@ const ProjectSidebar = () => {
                                 {getProjectSubItems(project.id).map((subItem) => {
                                     // checking if the current path matches the sub-item's URL
                                     const isActive =
-                                        location.pathname === `/projectsDetail` &&
+                                        location.pathname === `/app/workspace/projectsDetail` &&
                                         searchParams.get('id') === project.id &&
                                         searchParams.get('tab') === subItem.title.toLowerCase();
 

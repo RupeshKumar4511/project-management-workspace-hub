@@ -1,7 +1,12 @@
-export default function WorkspaceList({ workspaces }) {
+export default function WorkspaceList() {
+    const workspaces = [
+        { id: 1, name: "Acme Corp", description: "Product development & marketing" },
+        { id: 2, name: "Blue Ocean", description: "Client projects and delivery" },
+        { id: 3, name: "Nova Team", description: "Internal tools & R&D" },
+    ];
     return (
-        <div className="bg-white rounded-3xl shadow-lg p-8 md:p-10 w-full">
-            <h3 className="text-xl font-semibold text-gray-800 mb-4">
+        <div className="bg-white rounded-3xl shadow-lg md:p-10 w-full">
+            <h3 className="text-xl font-semibold text-gray-800 ">
                 Existing Workspaces
             </h3>
 
