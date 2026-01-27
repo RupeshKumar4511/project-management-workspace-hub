@@ -10,9 +10,9 @@ export default function WorkspaceHub() {
   return (
     <>
       <Header setOpen={setOpen}  />
-      <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-slate-50 to-indigo-100 p-6">
+      <div className="min-h-screen flex justify-center bg-gradient-to-br from-slate-50 to-indigo-100 p-6">
         <AppSideBar open={open} setOpen={setOpen}/>
-        <div className="flex justify-center items-center flex-col  ml-20">
+        <div className="flex justify-center items-center flex-col  ml-40">
           <Outlet/>
         </div>
       </div>
