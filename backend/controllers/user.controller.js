@@ -89,7 +89,7 @@ export const login = async (req, res) => {
         res.cookie("accessToken", accessToken, options)
         res.cookie("refreshToken",refreshToken, options)
 
-        return res.status(200).send({ success: true,username:user.username, message: "Login Successfully" })
+        return res.status(200).send({ success: true,username:user.username, email:user.email, message: "Login Successfully" })
 
     } catch (error) {
         return res.status(500).send({ success: false, message: "internal server error" })
