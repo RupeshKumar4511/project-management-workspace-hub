@@ -7,6 +7,21 @@ export const workspaceSchema = {
             errorMsg:"Workspace name must be string"
         }
     },
+    createdBy:{
+        notEmpty:{
+            errorMsg:"admin name is required"
+        },
+        isString:{
+            errorMsg:"admin name must be string"
+        },
+        isLength:{
+            options:{
+                min:3,
+                max:32,
+            },
+            errorMsg:"Admin name should be 3-32 characters long."
+        }
+    },
     adminEmail:{
         notEmpty:{
             errorMsg:"Admin Email is required"
