@@ -1,60 +1,134 @@
+import { useRef } from "react";
+import { useSelector,useDispatch } from "react-redux";
+import { useForm } from "react-hook-form";
+import {useNavigate} from 'react-router-dom'
+import { createWorkspace } from "../features/workspaceSlice";
+import ErrorPage from './ErrorPage.jsx'
+import SuccessModal from './SuccessModal.jsx'
+
 export default function CreateWorkspaceForm() {
-    return (
-        <div className="bg-white rounded-3xl shadow-lg p-8 md:p-10">
-            <h2 className="text-2xl font-semibold text-gray-800">
-                Create Your Workspace
-            </h2>
-            <p className="text-gray-500 mt-2">
-                Set up a new organizational space for your team and start managing
-                projects instantly.
-            </p>
 
+  const formRef = useRef(null);
+  const dispatch = useDispatch();
+  const navigate = useNavigate();
+  const { register, handleSubmit,reset, formState: { errors } } = useForm()
+  const { authResponse, error } = useSelector((store) => store.auth);
+  const { response } = useSelector((store) => store.workspace);
 
-            <form className="mt-6 grid grid-cols-1 md:grid-cols-2 gap-4">
-                <div>
-                    <label className="text-sm text-gray-600">Workspace Name</label>
-                    <input
-                        type="text"
-                        placeholder="e.g. My Company"
-                        className="mt-1 w-full rounded-xl border border-gray-300 px-4 py-3 focus:outline-none focus:ring-2 focus:ring-indigo-400"
-                    />
-                </div>
+  
+  const onSubmit = (data) => {
+    dispatch(createWorkspace({...data,createdBy:authResponse.username,email:authResponse.email}))
 
+    reset({
+            workspaceName:'',
+            description:'',
+            workspacePassword:'',
+            adminPassword: '',
+        })
+  };
 
-                <div>
-                    <label className="text-sm text-gray-600">Admin Name</label>
-                    <input
-                        type="text"
-                        placeholder="Your name"
-                        className="mt-1 w-full rounded-xl border border-gray-300 px-4 py-3 focus:outline-none focus:ring-2 focus:ring-indigo-400"
-                    />
-                </div>
+  const handleClick = ()=>{
+    navigate('/app');
+  }
 
+  if(response.createWorkspaceResponse?.success){
+     <SuccessModal message={"Your Workspace created Successfully."} handleClick={handleClick}/> 
+  }
 
-                <div className="md:col-span-2">
-                    <label className="text-sm text-gray-600">Description</label>
-                    <textarea
-                        rows={3}
-                        placeholder="Short description about your organization"
-                        className="mt-1 w-full rounded-xl border border-gray-300 px-4 py-3 focus:outline-none focus:ring-2 focus:ring-indigo-400"
-                    />
-                </div>
+  if (error.signOutError) {
+        return <ErrorPage/>
+    }
 
+  return (
+    <div className="bg-white rounded-3xl shadow-lg p-8 md:p-10 max-w-2xl mx-auto w-full">
+      <h2 className="text-2xl font-semibold text-gray-800">
+        Create Your Workspace
+      </h2>
+      <p className="text-gray-500 mt-2">
+        Set up a new organizational space for your team and start managing
+        projects instantly.
+      </p>
 
-                <div className="md:col-span-2">
-                    <label className="text-sm text-gray-600">Admin Password</label>
-                    <input
-                        type="password"
-                        placeholder="Set a secure password for admin"
-                        className="mt-1 w-full rounded-xl border border-gray-300 px-4 py-3 focus:outline-none focus:ring-2 focus:ring-indigo-400"
-                    />
-                </div>
-            </form>
-
-
-            <button className="w-full mt-6 rounded-xl bg-indigo-600 text-white py-3 font-medium hover:bg-indigo-700 transition">
-                Create Workspace
-            </button>
+      <form
+        onSubmit={handleSubmit(onSubmit)}
+        className="mt-6 grid grid-cols-1 gap-4"
+        ref={formRef}
+      >
+        <div className="md:col-span-2">
+          <label className="text-sm text-gray-600">Workspace Name</label>
+          <input
+            type="text"
+            name="workspaceName"
+            placeholder="e.g. My Company"
+            className="mt-1 w-full rounded-xl border border-gray-300 px-4 py-3 focus:outline-none focus:ring-2 focus:ring-indigo-400"
+            {...register("workspaceName", {
+                        required: "workspaceName is required",
+                        maxLength: {
+                            value: 20, message: "Length of workspaceName cannot exceeds 20 characters."
+                        }
+                    })}
+          />
+          <span className="text-red-500 md:text-sm text-[12px] ">{errors.workspaceName?.message}</span>
         </div>
-    );
+
+        <div className="md:col-span-2">
+          <label className="text-sm text-gray-600">Description</label>
+          <textarea
+            rows={3}
+            name="description"
+            placeholder="Short description about your organization"
+            className="mt-1 w-full rounded-xl border border-gray-300 px-4 py-3 focus:outline-none focus:ring-2 focus:ring-indigo-400"
+            {...register("description", {
+                        required: "description is required",
+                        maxLength: {
+                            value: 255, message: "Length of description cannot exceeds 255 characters."
+                        }
+                    })}
+          />
+          <span className="text-red-500 md:text-sm text-[12px] ">{errors.description?.message}</span>
+        </div>
+
+        <div className="md:col-span-2">
+          <label className="text-sm text-gray-600">Workspace Password</label>
+          <input
+            type="password"
+            name="workspacePassword"
+            placeholder="Set a secure password for workspace"
+            className="mt-1 w-full rounded-xl border border-gray-300 px-4 py-3 focus:outline-none focus:ring-2 focus:ring-indigo-400"
+            {...register("workspacePassword", {
+                        required: "workspacePassword is required",
+                        minLength: {
+                            value: 8 , message: "Length of workspacePassword must be atleast 8 characters long."
+                        }
+                    })}
+          />
+          <span className="text-red-500 md:text-sm text-[12px] ">{errors.workspacePassword?.message}</span>
+        </div>
+
+        <div className="md:col-span-2">
+          <label className="text-sm text-gray-600">Admin Password</label>
+          <input
+            type="password"
+            name="adminPassword"
+            placeholder="Set a secure admin password"
+            className="mt-1 w-full rounded-xl border border-gray-300 px-4 py-3 focus:outline-none focus:ring-2 focus:ring-indigo-400"
+            {...register("adminPassword", {
+                        required: "adminPassword is required",
+                        minLength: {
+                            value: 8 , message: "Length of adminPassword must be atleast 8 characters long."
+                        }
+                    })}
+          />
+          <span className="text-red-500 md:text-sm text-[12px] ">{errors.adminPassword?.message}</span>
+        </div>
+
+        <button
+          type="submit"
+          className="md:col-span-2 w-full mt-2 rounded-xl bg-indigo-600 text-white py-3 font-medium hover:bg-indigo-700 transition"
+        >
+          Create Workspace
+        </button>
+      </form>
+    </div>
+  );
 }
