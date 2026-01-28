@@ -1,10 +1,10 @@
 import { eq } from 'drizzle-orm';
 import {db} from '../config/db.js'
 import { users } from '../models/user.model.js';
-import {workspaces} from '../models/workspace.model.js'
+import {workspaces, workspaceUsers} from '../models/workspace.model.js'
 
 export const createWorkspace = async(req,res)=>{
-    const {workspaceName,adminEmail,description,workspacePassword,adminPassword} = req.body;
+    const {workspaceName,createdBy,description,workspacePassword,adminEmail,adminPassword} = req.body;
 
     try {
         const [workspace] = await db.select({workspaceName}).from(workspaces);
@@ -18,7 +18,12 @@ export const createWorkspace = async(req,res)=>{
             return res.status(400).send({message:"admin email does not exist"})
         }
 
-        await db.insert(workspaces).values({workspaceName,adminEmail,description,workspacePassword,adminPassword})
+        await db.transaction(async (tx) => {
+            await tx.insert(workspaces).values({workspaceName,createdBy,description,workspacePassword})
+
+            await tx.insert(workspaceUsers).values({workspaceName,username:createdBy,email:adminEmail,password:adminPassword,role:'admin'})
+        })
+        
 
         return res.status(200).send({success:true,message:"workspace created successfully."})
 
