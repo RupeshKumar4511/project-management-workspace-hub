@@ -1,10 +1,34 @@
-import { createSlice } from "@reduxjs/toolkit";
+import { createAsyncThunk, createSlice } from "@reduxjs/toolkit";
 import { dummyWorkspaces } from "../assets/assets";
+
+export const createWorkspace = createAsyncThunk('workspace/create', async (workspaceData, thunkAPI) => {
+    try {
+        const response = await fetch('http://localhost:3000/api/v1/workspace/create-workspace', {
+            method: "POST",
+            headers: { "Content-Type": 'application/json' },
+            body: JSON.stringify(workspaceData)
+        })
+        const data = await response.json()
+        if (!response.ok) {
+            return thunkAPI.rejectWithValue(data.message || "workspace creation failed");
+        }
+        return data;
+    } catch (error) {
+        return thunkAPI.rejectWithValue(error.message);
+    }
+})
 
 const initialState = {
     workspaces: dummyWorkspaces || [],
     currentWorkspace: dummyWorkspaces[1],
     loading: false,
+    response:{
+        createWorkspaceResponse:{},
+
+    },
+    error:{
+        createWorkspaceError:''
+    }
 };
 
 const workspaceSlice = createSlice({
@@ -101,10 +125,30 @@ const workspaceSlice = createSlice({
                     )
                 } : w
             );
+        },
+        updateWorkspaceResponse:(state)=>{
+            state.respone.createWorkspaceResponse = {};
         }
 
-    }
+    },
+    extraReducers: (builder => {
+            builder.addCase(createWorkspace.pending, (state) => {
+                state.loading = true;
+            })
+                .addCase(createWorkspace.fulfilled, (state, action) => {
+                    state.loading = false;
+                    state.error.createWorkspaceError = '';
+                    state.response = action.payload
+    
+                })
+                .addCase(createWorkspace.rejected, (state, action) => {
+                    state.loading = false;
+                    state.error.createWorkspaceError = action.payload || action.error.message || "Something went wrong.";
+    
+                })
+                
+        })
 });
 
-export const { setWorkspaces, setCurrentWorkspace, addWorkspace, updateWorkspace, deleteWorkspace, addProject, addTask, updateTask, deleteTask } = workspaceSlice.actions;
+export const { setWorkspaces, setCurrentWorkspace, addWorkspace, updateWorkspace, deleteWorkspace, addProject, addTask, updateTask, deleteTask,updateWorkspaceResponse } = workspaceSlice.actions;
 export default workspaceSlice.reducer;
