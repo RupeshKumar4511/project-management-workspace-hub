@@ -1,19 +1,22 @@
 import dotenv from 'dotenv';
 dotenv.config()
 import app from './app.js';
-import client from './config/db.js';
+import pool from './config/db.js';
 
 const PORT = process.env.PORT || 3000;
 
 
 
-client.connect((err)=>{
-    if(err){
-        console.log("Database Connection Error : \n",err.stack)
-    }else{
-        console.log("Database Connected Successfully.")
-        app.listen(PORT,()=>{
-        console.log(`server is listening on port ${PORT}`);
-    })
-    }
-})
+(async () => {
+  try {
+    await pool.query("SELECT 1");
+    console.log("Database connected");
+  } catch (err) {
+    console.error("Database connection failed", err);
+    process.exit(1);
+  }
+})();
+
+app.listen(PORT, () => {
+  console.log(`🚀 Server listening on port ${PORT}`);
+});
