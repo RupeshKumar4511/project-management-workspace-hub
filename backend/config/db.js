@@ -3,10 +3,10 @@ import {config} from 'dotenv';
 import {drizzle} from 'drizzle-orm/node-postgres';
 config()
 
-const client = new Pool({
+const pool = new Pool({
     connectionString:process.env.PostgreSQL_URI
 })
 
-export const db = drizzle(client);
+export const db = drizzle(pool);
 
-export default client;
+export default pool;
