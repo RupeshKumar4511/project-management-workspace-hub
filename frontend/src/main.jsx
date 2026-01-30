@@ -39,8 +39,8 @@ const router = createBrowserRouter([
     path: '/app', element: <WorkspaceHub />,
     errorElement: <ErrorPage />,
     children: [
-      { path: '/app', element: <WorkspaceList /> },
-      { path: '/app/create-workspace', element: <CreateWorkspaceForm /> },
+      { path: '/app', element: < CreateWorkspaceForm/> },
+      { path: '/app/user-workspace', element: <WorkspaceList /> },
       { path: '/app/profile', element: <Profile /> },
     ]
   },
