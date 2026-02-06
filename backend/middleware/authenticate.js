@@ -10,10 +10,18 @@ export const authentication = async(req,res,next)=>{
     try {
         const decodedData = jwt.verify(accessToken,process.env.JWT_SECRET);
         req.user = decodedData;
+        
 
         return next()
         
     } catch (error) {
-        return res.status(401).send({success:false,message:"Your access token is expired or invalid"})
+        const message = error.name === 'TokenExpiredError' 
+            ? "Token expired" 
+            : "Invalid token";
+
+        return res.status(401).json({ 
+            success: false, 
+            message 
+        });
     }
 }
