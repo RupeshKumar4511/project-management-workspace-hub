@@ -1,13 +1,22 @@
 export const workspaceSchema = {
     workspaceName:{
+        trim:true,
         notEmpty:{
             errorMsg:"Workspace name is required"
         },
         isString:{
             errorMsg:"Workspace name must be string"
+        },
+        isLength:{
+            options:{
+                min:2,
+                max:32
+            },
+            errorMsg:"Workspace name should be 2-32 characters long."
         }
     },
     createdBy:{
+        trim:true,
         notEmpty:{
             errorMsg:"admin name is required"
         },
@@ -23,6 +32,7 @@ export const workspaceSchema = {
         }
     },
     adminEmail:{
+        trim:true,
         notEmpty:{
             errorMsg:"Admin Email is required"
         },
@@ -42,6 +52,7 @@ export const workspaceSchema = {
         }
     },
     description:{
+        trim:true,
         notEmpty:{
             errorMsg:"Description is required"
         },
@@ -50,6 +61,7 @@ export const workspaceSchema = {
         }
     },
     workspacePassword:{
+        trim:true,
         notEmpty:{
             errorMsg:"workspacePassword is required"
         },
@@ -60,24 +72,38 @@ export const workspaceSchema = {
             options:[/^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?&])[A-Za-z\d@$!%*?&]{8,}$/],
             errorMsg: "Password must contain uppercase, lowercase, number & special character"
         }
+    }
+}
+
+export const joinWorkspaceSchema = {
+    workspaceName:{
+        trim:true,
+        notEmpty:{
+            errorMsg:"Workspace name must be required",
+        },
+        isString:{
+            errorMsg : "Workspace name must be string"
+        },
+        isLength:{
+            options:{
+                min:2,
+                max:32
+            },
+            errorMsg:"Workspace name should be 2-32 characters long."
+        }
     },
-    adminPassword:{
+    workspacePassword:{
+        trim:true,
         notEmpty:{
             errorMsg:"workspacePassword is required"
         },
         isString:{
             errorMsg:"workspacePassword must be string"
         },
-        isLength: {
-            options: {
-                min: 8,
-                max: 32
-            },
-            errorMsg: "Workspace password must be atleast 8-32 characters long."
-        },
         matches:{
             options:[/^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?&])[A-Za-z\d@$!%*?&]{8,}$/],
-            errorMsg: "Workspace password must contain uppercase, lowercase, number & special character"
+            errorMsg: "Password must contain uppercase, lowercase, number & special character"
         }
     }
+
 }

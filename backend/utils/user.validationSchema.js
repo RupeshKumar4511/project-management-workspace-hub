@@ -1,5 +1,6 @@
 export const loginSchema = {
     username: {
+        trim:true,
         notEmpty: {
             errorMsg: "Username is required."
         },
@@ -15,6 +16,7 @@ export const loginSchema = {
         }
     },
     password: {
+        trim:true,
         notEmpty: {
             errorMsg: "Password is required."
         },
@@ -38,6 +40,7 @@ export const loginSchema = {
 
 export const signUpSchema = {
     otp: {
+        trim:true,
         notEmpty: {
             errorMsg: "OTP is required"
         },
@@ -53,6 +56,7 @@ export const signUpSchema = {
         },
     },
     username: {
+        trim:true,
         notEmpty: {
             errorMsg: "Username is required."
         },
@@ -68,6 +72,7 @@ export const signUpSchema = {
         }
     },
     email: {
+        trim:true,
         notEmpty: {
             errorMsg: "email is required."
         },
@@ -87,6 +92,7 @@ export const signUpSchema = {
         }
     },
     password: {
+        trim:true,
         notEmpty: {
             errorMsg: "Password is required."
         },
@@ -110,6 +116,7 @@ export const signUpSchema = {
 
 export const resetPasswordSchema = {
     otp: {
+        trim:true,
         notEmpty: {
             errorMsg: "OTP is required"
         },
@@ -125,6 +132,7 @@ export const resetPasswordSchema = {
         },
     },
     email: {
+        trim:true,
         notEmpty: {
             errorMsg: "email is required"
         },
@@ -140,6 +148,7 @@ export const resetPasswordSchema = {
         }
     },
     password: {
+        trim:true,
         notEmpty: {
             errorMsg: "Password is required."
         },
@@ -164,6 +173,7 @@ export const resetPasswordSchema = {
 
 export const verifyUserSchema = {
     email: {
+        trim:true,
         notEmpty: {
             errorMsg: "email is required"
         },
@@ -183,6 +193,7 @@ export const verifyUserSchema = {
         }
     },
     otp: {
+        trim:true,
         notEmpty: {
             errorMsg: "OTP is required"
         },
