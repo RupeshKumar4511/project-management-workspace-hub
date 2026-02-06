@@ -6,7 +6,26 @@ export const createWorkspace = createAsyncThunk('workspace/create', async (works
         const response = await fetch('http://localhost:3000/api/v1/workspace/create-workspace', {
             method: "POST",
             headers: { "Content-Type": 'application/json' },
-            body: JSON.stringify(workspaceData)
+            body: JSON.stringify(workspaceData),
+            credentials: 'include'
+        })
+        const data = await response.json()
+        if (!response.ok) {
+            return thunkAPI.rejectWithValue(data.message || "workspace creation failed");
+        }
+        return data;
+    } catch (error) {
+        return thunkAPI.rejectWithValue(error.message);
+    }
+})
+
+export const joinWorkspace = createAsyncThunk('workspace/join', async (joinWorkspaceData, thunkAPI) => {
+    try {
+        const response = await fetch('http://localhost:3000/api/v1/workspace/join-workspace', {
+            method: "POST",
+            headers: { "Content-Type": 'application/json' },
+            body: JSON.stringify(joinWorkspaceData),
+            credentials: 'include'
         })
         const data = await response.json()
         if (!response.ok) {
@@ -22,12 +41,13 @@ const initialState = {
     workspaces: dummyWorkspaces || [],
     currentWorkspace: dummyWorkspaces[1],
     loading: false,
-    response:{
-        createWorkspaceResponse:{},
-
+    response: {
+        createWorkspaceResponse: {},
+        joinWorkspaceResponse: {}
     },
-    error:{
-        createWorkspaceError:''
+    error: {
+        createWorkspaceError: '',
+        joinWorkspaceError: ''
     }
 };
 
@@ -126,8 +146,11 @@ const workspaceSlice = createSlice({
                 } : w
             );
         },
-        updateWorkspaceResponse:(state)=>{
-            state.respone.createWorkspaceResponse = {};
+        updateCreateWorkspaceResponse: (state) => {
+            state.response.createWorkspaceResponse = {};
+        },
+        updateJoinWorkspaceResponse: (state) => {
+            state.response.joinWorkspaceResponse = {};
         }
 
     },
@@ -135,20 +158,35 @@ const workspaceSlice = createSlice({
             builder.addCase(createWorkspace.pending, (state) => {
                 state.loading = true;
             })
-                .addCase(createWorkspace.fulfilled, (state, action) => {
-                    state.loading = false;
-                    state.error.createWorkspaceError = '';
-                    state.response = action.payload
-    
-                })
-                .addCase(createWorkspace.rejected, (state, action) => {
-                    state.loading = false;
-                    state.error.createWorkspaceError = action.payload || action.error.message || "Something went wrong.";
-    
-                })
-                
-        })
+            .addCase(createWorkspace.fulfilled, (state, action) => {
+                state.loading = false;
+                state.error.createWorkspaceError = '';
+                state.response.createWorkspaceResponse = action.payload
+
+            })
+            .addCase(createWorkspace.rejected, (state, action) => {
+                state.loading = false;
+                state.error.createWorkspaceError = action.payload || action.error.message || "Something went wrong.";
+
+            })
+            .addCase(joinWorkspace.pending, (state) => {
+                state.loading = true;
+            })
+            .addCase(joinWorkspace.fulfilled, (state, action) => {
+                state.loading = false;
+                state.error.joinWorkspaceError = '';
+                state.response.joinWorkspaceResponse = action.payload
+                state.currentWorkspace=action.payload
+
+            })
+            .addCase(joinWorkspace.rejected, (state, action) => {
+                state.loading = false;
+                state.error.joinWorkspaceError = action.payload || action.error.message || "Something went wrong.";
+
+            })
+
+    })
 });
 
-export const { setWorkspaces, setCurrentWorkspace, addWorkspace, updateWorkspace, deleteWorkspace, addProject, addTask, updateTask, deleteTask,updateWorkspaceResponse } = workspaceSlice.actions;
+export const { setWorkspaces, setCurrentWorkspace, addWorkspace, updateWorkspace, deleteWorkspace, addProject, addTask, updateTask, deleteTask, updateCreateWorkspaceResponse, updateJoinWorkspaceResponse } = workspaceSlice.actions;
 export default workspaceSlice.reducer;
