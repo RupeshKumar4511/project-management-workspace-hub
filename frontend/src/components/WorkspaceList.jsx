@@ -1,20 +1,37 @@
 import { useRef } from "react";
 import { useForm } from "react-hook-form";
+import { joinWorkspace, updateJoinWorkspaceResponse } from "../features/workspaceSlice";
+import { useDispatch, useSelector } from "react-redux";
+import ErrorPage from "./ErrorPage";
+import { useNavigate } from "react-router-dom";
 
 export default function WorkspaceList() {
   const formRef = useRef(null);
-  const { register, handleSubmit,reset, formState: { errors } } = useForm()
-  
+  const { register, handleSubmit, reset, formState: { errors } } = useForm();
+  const navigate = useNavigate()
+  const dispatch = useDispatch()
+  const {  error } = useSelector((store) => store.auth);
+  const { response } = useSelector((store) => store.workspace);
+
   const onSubmit = (data) => {
-    // add user email to data
-    console.log(data);
-    
-    reset({
-            workspaceName:'',
-            workspacePassword:'',
-            
-        })
+    dispatch(joinWorkspace(data));
   };
+
+  if(response.joinWorkspaceResponse.success){
+    reset({
+      workspaceName: '',
+      workspacePassword: '',
+
+    })
+    dispatch(updateJoinWorkspaceResponse())
+    setTimeout(()=>{
+      navigate('/app/workspace');
+    },10)
+  }
+
+  if(error.signOutError){
+    return <ErrorPage/>
+  }
 
   return (
     <div className="w-[50%] space-y-8 relative -top-20">
@@ -35,11 +52,11 @@ export default function WorkspaceList() {
               placeholder="e.g. Acme Corp"
               className="w-full rounded-xl border border-gray-300 px-4 py-3 focus:outline-none focus:ring-2 focus:ring-indigo-400"
               {...register("workspaceName", {
-                        required: "workspaceName is required",
-                        maxLength: {
-                            value: 20 , message: "Length of workspaceName should not exceeds 20 characters."
-                        }
-                    })}
+                required: "workspaceName is required",
+                maxLength: {
+                  value: 20, message: "Length of workspaceName should not exceeds 20 characters."
+                }
+              })}
             />
             <span className="text-red-500 md:text-sm text-[12px] ">{errors.workspaceName?.message}</span>
           </div>
@@ -54,11 +71,11 @@ export default function WorkspaceList() {
               placeholder="Enter workspace password"
               className="w-full rounded-xl border border-gray-300 px-4 py-3 focus:outline-none focus:ring-2 focus:ring-indigo-400"
               {...register("workspacePassword", {
-                        required: "workspacePassword is required",
-                        minLength: {
-                            value: 8 , message: "Length of workspacePassword must be atleast 8 characters long."
-                        }
-                    })}
+                required: "workspacePassword is required",
+                minLength: {
+                  value: 8, message: "Length of workspacePassword must be atleast 8 characters long."
+                }
+              })}
             />
             <span className="text-red-500 md:text-sm text-[12px] ">{errors.workspacePassword?.message}</span>
           </div>
@@ -72,7 +89,7 @@ export default function WorkspaceList() {
         </form>
       </div>
 
-      
+
     </div>
   );
 }

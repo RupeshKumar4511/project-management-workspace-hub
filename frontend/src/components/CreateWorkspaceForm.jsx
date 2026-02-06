@@ -2,7 +2,7 @@ import { useRef } from "react";
 import { useSelector,useDispatch } from "react-redux";
 import { useForm } from "react-hook-form";
 import {useNavigate} from 'react-router-dom'
-import { createWorkspace } from "../features/workspaceSlice";
+import { createWorkspace, updateCreateWorkspaceResponse } from "../features/workspaceSlice";
 import ErrorPage from './ErrorPage.jsx'
 import SuccessModal from './SuccessModal.jsx'
 
@@ -17,22 +17,22 @@ export default function CreateWorkspaceForm() {
 
   
   const onSubmit = (data) => {
-    dispatch(createWorkspace({...data,createdBy:authResponse.username,email:authResponse.email}))
+    dispatch(createWorkspace({...data,createdBy:authResponse.username,adminEmail:authResponse.email}))
+  };
 
+  const handleClick = ()=>{
     reset({
             workspaceName:'',
             description:'',
             workspacePassword:'',
             adminPassword: '',
-        })
-  };
-
-  const handleClick = ()=>{
-    navigate('/app');
+      });
+    dispatch(updateCreateWorkspaceResponse())
+    navigate('/app/user-workspace');
   }
 
   if(response.createWorkspaceResponse?.success){
-     <SuccessModal message={"Your Workspace created Successfully."} handleClick={handleClick}/> 
+    return <SuccessModal message={"Your Workspace created Successfully."} handleClick={handleClick}/> 
   }
 
   if (error.signOutError) {
@@ -105,22 +105,6 @@ export default function CreateWorkspaceForm() {
           <span className="text-red-500 md:text-sm text-[12px] ">{errors.workspacePassword?.message}</span>
         </div>
 
-        <div className="md:col-span-2">
-          <label className="text-sm text-gray-600">Admin Password</label>
-          <input
-            type="password"
-            name="adminPassword"
-            placeholder="Set a secure admin password"
-            className="mt-1 w-full rounded-xl border border-gray-300 px-4 py-3 focus:outline-none focus:ring-2 focus:ring-indigo-400"
-            {...register("adminPassword", {
-                        required: "adminPassword is required",
-                        minLength: {
-                            value: 8 , message: "Length of adminPassword must be atleast 8 characters long."
-                        }
-                    })}
-          />
-          <span className="text-red-500 md:text-sm text-[12px] ">{errors.adminPassword?.message}</span>
-        </div>
 
         <button
           type="submit"
