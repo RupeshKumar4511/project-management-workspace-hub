@@ -12,6 +12,7 @@ export const generateAccessToken = (user) => {
     return jwt.sign({
         id: user.id,
         username: user.username,
+        email: user.email
     }, process.env.JWT_SECRET, {
         expiresIn: '15m'
     })
@@ -23,7 +24,8 @@ export const generateRefreshToken = (user) => {
         {
             id: user.id,
             username: user.username,
-            email: user.email
+            email: user.email,
+            role: user.role
         },
         process.env.JWT_SECRET,
         { expiresIn: '7d' }
@@ -102,7 +104,8 @@ export const login = async (req, res) => {
 
 // generate New refreshToken
 export const generateNewRefreshToken = async (req, res) => {
-    const token = req.cookies?.refreshToken || req.body.refreshToken;
+    const token = req.cookies?.refreshToken;
+    
     if (!token) {
         return res.status(401).send({ message: "Unauthorized Request" })
     }
@@ -110,11 +113,11 @@ export const generateNewRefreshToken = async (req, res) => {
     try {
 
         const decodedData = jwt.verify(token, process.env.JWT_SECRET)
-        const [dbToken] = await db.select().from(tokens).where(eq(tokens.id, decodedData.userId))
+        const [dbToken] = await db.select().from(tokens).where(eq(tokens.userId, decodedData.id))
 
         if (!dbToken) {
             return res.status(403).send({ message: "Invalid Refresh token" })
-        }
+        }       
 
         if (dbToken?.refreshToken !== token) {
             return res.status(403).send({ message: "your refresh token is expired or used" })
@@ -123,11 +126,13 @@ export const generateNewRefreshToken = async (req, res) => {
         const accessToken = generateAccessToken(decodedData)
         const newRefreshToken = generateRefreshToken(decodedData)
 
-        await db.update(tokens).set({ refreshToken: newRefreshToken }).where(eq(dbToken.refreshToken, token))
+        const expiresAt = new Date(Date.now() + 1000 * 60 * 60 * 24 * 7);
+        await db.update(tokens).set({ refreshToken: newRefreshToken,expiredAt:expiresAt }).where(eq(dbToken.refreshToken, token))
 
         res.cookie("accessToken", accessToken,options)
         res.cookie("refreshToken", newRefreshToken,options)
-        res.status(204)
+
+        res.status(200).send({success:true,username:decodedData.username,email:decodedData.email})
 
     } catch (error) {
         return res.status(401).send({ success: false, message: "Invalid or Expired Token" });
@@ -215,3 +220,8 @@ export const sendEmailController = async (req, res) => {
     return res.status(500).send({success:false,message:"Internal Server Error"})
   }
 };
+
+
+export const getUserData = async(req,res)=>{
+    return res.status(200).send({success:true,username:req.user.username,email:req.user.email})
+}
