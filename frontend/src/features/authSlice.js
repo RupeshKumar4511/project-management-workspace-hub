@@ -1,4 +1,5 @@
 import { createAsyncThunk, createSlice } from "@reduxjs/toolkit";
+import ensureAuth from "./ensureAuth";
 
 export const signUp = createAsyncThunk('auth/signup', async (userData, thunkAPI) => {
     try {
@@ -37,6 +38,7 @@ export const signIn = createAsyncThunk('auth/signin', async (userData,thunkAPI) 
 
 export const signOut = createAsyncThunk('auth/signOut', async (userData,thunkAPI) => {
     try {
+        await ensureAuth()
         const response = await fetch('http://localhost:3000/api/v1/users/logout', {
             method: "POST",
             headers: { "Content-Type": 'application/json' },
@@ -160,6 +162,9 @@ const authSlice = createSlice({
             state.resetPasswordResponse="";
             state.error.resetPasswordError="";
         },
+        updateLogoutResponse:(state)=>{
+            state.error.logoutError = '';   
+        }
     },
     extraReducers: (builder => {
         builder.addCase(signUp.pending, (state) => {

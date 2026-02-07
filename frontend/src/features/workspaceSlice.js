@@ -1,8 +1,10 @@
 import { createAsyncThunk, createSlice } from "@reduxjs/toolkit";
 import { dummyWorkspaces } from "../assets/assets";
+import ensureAuth from "./ensureAuth";
 
 export const createWorkspace = createAsyncThunk('workspace/create', async (workspaceData, thunkAPI) => {
     try {
+        await ensureAuth()
         const response = await fetch('http://localhost:3000/api/v1/workspace/create-workspace', {
             method: "POST",
             headers: { "Content-Type": 'application/json' },
@@ -21,6 +23,7 @@ export const createWorkspace = createAsyncThunk('workspace/create', async (works
 
 export const joinWorkspace = createAsyncThunk('workspace/join', async (joinWorkspaceData, thunkAPI) => {
     try {
+        await ensureAuth();
         const response = await fetch('http://localhost:3000/api/v1/workspace/join-workspace', {
             method: "POST",
             headers: { "Content-Type": 'application/json' },
@@ -29,7 +32,7 @@ export const joinWorkspace = createAsyncThunk('workspace/join', async (joinWorks
         })
         const data = await response.json()
         if (!response.ok) {
-            return thunkAPI.rejectWithValue(data.message || "workspace creation failed");
+            return thunkAPI.rejectWithValue(data.message || "failed to join workspace");
         }
         return data;
     } catch (error) {
@@ -148,9 +151,11 @@ const workspaceSlice = createSlice({
         },
         updateCreateWorkspaceResponse: (state) => {
             state.response.createWorkspaceResponse = {};
+            state.error.createWorkspaceError=''
         },
         updateJoinWorkspaceResponse: (state) => {
             state.response.joinWorkspaceResponse = {};
+            state.error.joinWorkspaceError = ''
         }
 
     },
@@ -176,7 +181,7 @@ const workspaceSlice = createSlice({
                 state.loading = false;
                 state.error.joinWorkspaceError = '';
                 state.response.joinWorkspaceResponse = action.payload
-                state.currentWorkspace=action.payload
+                
 
             })
             .addCase(joinWorkspace.rejected, (state, action) => {
