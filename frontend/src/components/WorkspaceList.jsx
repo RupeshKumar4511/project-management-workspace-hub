@@ -2,16 +2,15 @@ import { useRef } from "react";
 import { useForm } from "react-hook-form";
 import { joinWorkspace, updateJoinWorkspaceResponse } from "../features/workspaceSlice";
 import { useDispatch, useSelector } from "react-redux";
-import ErrorPage from "./ErrorPage";
 import { useNavigate } from "react-router-dom";
+
 
 export default function WorkspaceList() {
   const formRef = useRef(null);
   const { register, handleSubmit, reset, formState: { errors } } = useForm();
   const navigate = useNavigate()
   const dispatch = useDispatch()
-  const {  error } = useSelector((store) => store.auth);
-  const { response } = useSelector((store) => store.workspace);
+  const { response,error } = useSelector((store) => store.workspace);
 
   const onSubmit = (data) => {
     dispatch(joinWorkspace(data));
@@ -29,10 +28,6 @@ export default function WorkspaceList() {
     },10)
   }
 
-  if(error.signOutError){
-    return <ErrorPage/>
-  }
-
   return (
     <div className="w-[50%] space-y-8 relative -top-20">
       {/* Join Workspace Form */}
@@ -42,6 +37,9 @@ export default function WorkspaceList() {
         </h3>
 
         <form className="space-y-5" onSubmit={handleSubmit(onSubmit)} ref={formRef}>
+
+          <p className={`text-red-500 ${response.joinWorkspaceResponse.success?'hidden':''}`}>{!response.joinWorkspaceResponse.success?response.joinWorkspaceResponse.message:''}</p>
+          <p className={`text-red-500 ${error.joinWorkspaceError?'':'hidden'}`}>{error.joinWorkspaceError?error.joinWorkspaceError:''}</p>
           <div>
             <label className="block text-sm font-medium text-gray-600 mb-1">
               Organization/Workspace Name

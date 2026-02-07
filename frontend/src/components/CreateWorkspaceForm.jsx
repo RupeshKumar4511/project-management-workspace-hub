@@ -1,43 +1,42 @@
 import { useRef } from "react";
-import { useSelector,useDispatch } from "react-redux";
+import { useSelector, useDispatch } from "react-redux";
 import { useForm } from "react-hook-form";
-import {useNavigate} from 'react-router-dom'
+import { useNavigate } from 'react-router-dom'
 import { createWorkspace, updateCreateWorkspaceResponse } from "../features/workspaceSlice";
-import ErrorPage from './ErrorPage.jsx'
 import SuccessModal from './SuccessModal.jsx'
+
 
 export default function CreateWorkspaceForm() {
 
   const formRef = useRef(null);
   const dispatch = useDispatch();
   const navigate = useNavigate();
-  const { register, handleSubmit,reset, formState: { errors } } = useForm()
+  const { register, handleSubmit, reset, formState: { errors } } = useForm()
   const { authResponse, error } = useSelector((store) => store.auth);
   const { response } = useSelector((store) => store.workspace);
 
-  
+
   const onSubmit = (data) => {
-    dispatch(createWorkspace({...data,createdBy:authResponse.username,adminEmail:authResponse.email}))
+    dispatch(createWorkspace({ ...data, createdBy: authResponse.username, adminEmail: authResponse.email }))
   };
 
-  const handleClick = ()=>{
+  const handleClick = () => {
     reset({
-            workspaceName:'',
-            description:'',
-            workspacePassword:'',
-            adminPassword: '',
-      });
+      workspaceName: '',
+      description: '',
+      workspacePassword: '',
+      adminPassword: '',
+    });
     dispatch(updateCreateWorkspaceResponse())
-    navigate('/app/user-workspace');
+    setTimeout(()=>{
+      navigate('/app/user-workspace');
+    })
   }
 
-  if(response.createWorkspaceResponse?.success){
-    return <SuccessModal message={"Your Workspace created Successfully."} handleClick={handleClick}/> 
+  if (response.createWorkspaceResponse?.success) {
+    return <SuccessModal message={"Your Workspace created Successfully."} handleClick={handleClick} />
   }
 
-  if (error.signOutError) {
-        return <ErrorPage/>
-    }
 
   return (
     <div className="bg-white rounded-3xl shadow-lg p-8 md:p-10 max-w-2xl mx-auto w-full">
@@ -54,6 +53,8 @@ export default function CreateWorkspaceForm() {
         className="mt-6 grid grid-cols-1 gap-4"
         ref={formRef}
       >
+        <p className={`text-red-500 ${response.createWorkspaceResponse.success ? 'hidden' : ''}`}>{!response.createWorkspaceResponse.success ? response.createWorkspaceResponse.message : ''}</p>
+        <p className={`text-red-500 ${error.createWorkspaceError ? '' : 'hidden'}`}>{error.createWorkspaceError ? error.createWorkspaceError : ''}</p>
         <div className="md:col-span-2">
           <label className="text-sm text-gray-600">Workspace Name</label>
           <input
@@ -62,11 +63,11 @@ export default function CreateWorkspaceForm() {
             placeholder="e.g. My Company"
             className="mt-1 w-full rounded-xl border border-gray-300 px-4 py-3 focus:outline-none focus:ring-2 focus:ring-indigo-400"
             {...register("workspaceName", {
-                        required: "workspaceName is required",
-                        maxLength: {
-                            value: 20, message: "Length of workspaceName cannot exceeds 20 characters."
-                        }
-                    })}
+              required: "workspaceName is required",
+              maxLength: {
+                value: 20, message: "Length of workspaceName cannot exceeds 20 characters."
+              }
+            })}
           />
           <span className="text-red-500 md:text-sm text-[12px] ">{errors.workspaceName?.message}</span>
         </div>
@@ -79,11 +80,11 @@ export default function CreateWorkspaceForm() {
             placeholder="Short description about your organization"
             className="mt-1 w-full rounded-xl border border-gray-300 px-4 py-3 focus:outline-none focus:ring-2 focus:ring-indigo-400"
             {...register("description", {
-                        required: "description is required",
-                        maxLength: {
-                            value: 255, message: "Length of description cannot exceeds 255 characters."
-                        }
-                    })}
+              required: "description is required",
+              maxLength: {
+                value: 255, message: "Length of description cannot exceeds 255 characters."
+              }
+            })}
           />
           <span className="text-red-500 md:text-sm text-[12px] ">{errors.description?.message}</span>
         </div>
@@ -96,11 +97,11 @@ export default function CreateWorkspaceForm() {
             placeholder="Set a secure password for workspace"
             className="mt-1 w-full rounded-xl border border-gray-300 px-4 py-3 focus:outline-none focus:ring-2 focus:ring-indigo-400"
             {...register("workspacePassword", {
-                        required: "workspacePassword is required",
-                        minLength: {
-                            value: 8 , message: "Length of workspacePassword must be atleast 8 characters long."
-                        }
-                    })}
+              required: "workspacePassword is required",
+              minLength: {
+                value: 8, message: "Length of workspacePassword must be atleast 8 characters long."
+              }
+            })}
           />
           <span className="text-red-500 md:text-sm text-[12px] ">{errors.workspacePassword?.message}</span>
         </div>

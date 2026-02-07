@@ -2,7 +2,7 @@ import { NavLink, useNavigate } from 'react-router-dom';
 import { IoIosArrowDropdownCircle } from "react-icons/io";
 import { useEffect, useState } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
-import { signOut } from '../features/authSlice';
+import {  signOut } from '../features/authSlice';
 
 
 export default function AppSideBar({ open, setOpen }) {
@@ -10,7 +10,7 @@ export default function AppSideBar({ open, setOpen }) {
     const dispatch = useDispatch()
     const [menu, setMenu] = useState(false);
 
-    const { authResponse, error } = useSelector((store) => store.auth);
+    const { authResponse } = useSelector((store) => store.auth);
     const handleSignOut = () => {
         dispatch(signOut({ username: authResponse.username }))
 
@@ -20,11 +20,7 @@ export default function AppSideBar({ open, setOpen }) {
         if (authResponse.logout) {
                 navigate('/');
         }
-    }, [authResponse, navigate])
-
-    if (error.signOutError) {
-        alert("Something went wrong.")
-    }
+    }, [authResponse, navigate])    
 
     function getUserName(user) {
         const username = user.charAt(0).toUpperCase() + user.slice(1);
