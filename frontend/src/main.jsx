@@ -21,6 +21,8 @@ import Dashboard from './pages/Dashboard.jsx'
 import WorkspaceList from './components/WorkspaceList.jsx'
 import CreateWorkspaceForm from './components/CreateWorkspaceForm.jsx'
 import Profile from './components/Profile.jsx'
+import ProtectedRoute from './ProtectedRoute.jsx'
+import ensureAuth from './features/ensureAuth.js'
 
 const router = createBrowserRouter([
 
@@ -36,23 +38,25 @@ const router = createBrowserRouter([
     ]
   },
   {
-    path: '/app', element: <WorkspaceHub />,
+    path: '/app', element: <ProtectedRoute><WorkspaceHub /></ProtectedRoute>,
     errorElement: <ErrorPage />,
+    loader:ensureAuth,
     children: [
-      { path: '/app', element: < CreateWorkspaceForm/> },
-      { path: '/app/user-workspace', element: <WorkspaceList /> },
-      { path: '/app/profile', element: <Profile /> },
+      { path: '/app', element: <ProtectedRoute>< CreateWorkspaceForm /> </ProtectedRoute>},
+      { path: '/app/user-workspace', element: <ProtectedRoute> <WorkspaceList /></ProtectedRoute> },
+      { path: '/app/profile', element: <ProtectedRoute> <Profile /></ProtectedRoute> },
     ]
   },
   {
-    path: '/app/workspace', element: <App />,
+    path: '/app/workspace', element: <ProtectedRoute> <App/></ProtectedRoute>,
     errorElement: <ErrorPage />,
+    loader:ensureAuth,
     children: [
-      { index:true, element: <Dashboard /> },
-      { path: '/app/workspace/team', element: <Team /> },
-      { path: '/app/workspace/projects', element: <Projects /> },
-      { path: '/app/workspace/projectsDetail', element: <ProjectDetails /> },
-      { path: '/app/workspace/taskDetails', element: <TaskDetails /> },
+      { index: true, element: <ProtectedRoute> <Dashboard /></ProtectedRoute> },
+      { path: '/app/workspace/team', element: <ProtectedRoute> <Team /></ProtectedRoute> },
+      { path: '/app/workspace/projects', element: <ProtectedRoute> <Projects /></ProtectedRoute> },
+      { path: '/app/workspace/projectsDetail', element: <ProtectedRoute> <ProjectDetails /></ProtectedRoute> },
+      { path: '/app/workspace/taskDetails', element: <ProtectedRoute> <TaskDetails /></ProtectedRoute> },
     ]
   }
 
