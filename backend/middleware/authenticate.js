@@ -2,7 +2,7 @@ import jwt from 'jsonwebtoken';
 import {config} from 'dotenv';
 config()
 export const authentication = async(req,res,next)=>{
-    const accessToken = req.cookies?.accessToken || req.body.accessToken;
+    const accessToken = req.cookies?.accessToken;
     if(!accessToken){
         return res.status(401).send({success:false,message:"Access Token is required"})
     }
