@@ -8,6 +8,7 @@ const CreateProjectDialog = ({ isDialogOpen, setIsDialogOpen }) => {
 
     const [formData, setFormData] = useState({
         name: "",
+        project_link:"",
         description: "",
         status: "PLANNING",
         priority: "MEDIUM",
@@ -50,6 +51,12 @@ const CreateProjectDialog = ({ isDialogOpen, setIsDialogOpen }) => {
                     <div>
                         <label className="block text-sm mb-1">Project Name</label>
                         <input type="text" value={formData.name} onChange={(e) => setFormData({ ...formData, name: e.target.value })} placeholder="Enter project name" className="w-full px-3 py-2 rounded dark:bg-zinc-900 border border-zinc-300 dark:border-zinc-700 mt-1 text-zinc-900 dark:text-zinc-200 text-sm" required />
+                    </div>
+
+                    {/* Project Link */}
+                    <div>
+                        <label className="block text-sm mb-1">Project Link</label>
+                        <input type="text" value={formData.project_link} onChange={(e) => setFormData({ ...formData, project_link: e.target.value })} placeholder="Enter project Link" className="w-full px-3 py-2 rounded dark:bg-zinc-900 border border-zinc-300 dark:border-zinc-700 mt-1 text-zinc-900 dark:text-zinc-200 text-sm" />
                     </div>
 
                     {/* Description */}

@@ -11,7 +11,7 @@ const Home = () => {
         <>
             <header className="flex min-w-full md:py-4 h-12 md:h-auto shadow-md bg-gray-200 items-center px-5 py-1 justify-between sticky top-0 z-10">
                 <div className='flex justify-center items-center gap-4'>
-                    <h2 className='md:text-3xl text-blue-900 font-bold text-xl'>PMWHub</h2>
+                    <h2 className='md:text-3xl text-blue-900 font-bold text-xl'>WorkspaceHub</h2>
                     <h4 className='pt-1 text-blue-900 text-xs md:text-xl hidden md:block'>Workspace where organizations manage projects</h4>
                 </div>
 

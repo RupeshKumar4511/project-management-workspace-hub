@@ -7,6 +7,7 @@ export default function ProjectSettings({ project }) {
 
     const [formData, setFormData] = useState({
         name: "New Website Launch",
+        project_link: "https://github.com/RupeshKumar4511/project-managment-workspace-hub",
         description: "Initial launch for new web platform.",
         status: "PLANNING",
         priority: "MEDIUM",
@@ -43,6 +44,12 @@ export default function ProjectSettings({ project }) {
                     <div className="space-y-2">
                         <label className={labelClasses}>Project Name</label>
                         <input value={formData.name} onChange={(e) => setFormData({ ...formData, name: e.target.value })} className={inputClasses} required />
+                    </div>
+
+                    {/* Project Link */}
+                    <div className="space-y-2">
+                        <label className={labelClasses}>Project Link</label>
+                        <input value={formData.project_link} onChange={(e) => setFormData({ ...formData, project_link: e.target.value })} className={inputClasses} required />
                     </div>
 
                     {/* Description */}
