@@ -30,6 +30,7 @@ export const projects = pgTable('projects',{
     id:serial("id").notNull().primaryKey(),
     title:varchar("title",{length:255}).notNull(),
     workspaceName:varchar("workspace_name",{length:32}).notNull().references(()=>workspaces.workspaceName,{onDelete:'cascade'}),
+    projectLink: text("project_link"),
     description:varchar("description",{length:1000}).notNull(),
     status:projectStatusEnum('status').notNull(),
     priority:priorityEnum("priority").notNull(),
