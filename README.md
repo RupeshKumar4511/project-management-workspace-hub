@@ -1,4 +1,4 @@
-# Project Management System
+# Project Management Workspace Hub
 A Full Stack Application.
 
 # TechStack : 
@@ -11,6 +11,12 @@ Tailwind CSS
 Node.js + Express.js
 <br>
 PostgreSQL
+<br>
+MongoDB
+<br>
+Redis
+<br>
+Kafka
 
 
 # Frontend Reference : 
