@@ -46,6 +46,11 @@ export const signOut = createAsyncThunk('auth/signOut', async (userData,thunkAPI
             body: JSON.stringify(userData)
         })
         const data = await response.json()
+        if(data.code == 'SIGNED_OUT'){
+          alert("You are Signed out. Please Login to continue");
+          window.location.href = '/'; 
+          return data;
+        }
         if (!response.ok) {
             return thunkAPI.rejectWithValue(data.message || "sign-out failed");
         }

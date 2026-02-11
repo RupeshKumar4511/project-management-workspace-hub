@@ -22,14 +22,20 @@ const  ensureAuth = async () => {
     });
 
     const data = await response.json();
-
     if (response.ok) {
       localStorage.setItem("user", JSON.stringify(data));
       return data;
     } else if(data.message == 'Token expired'){
         const res = await generateNewRefreshToken();
-        localStorage.setItem("user", JSON.stringify(res));
-    }else {
+        if(res.code == 'SIGNED_OUT'){
+          alert("You are Signed out. Please Login to continue");
+          window.location.href='/'
+          return data;
+        }else{
+          localStorage.setItem("user", JSON.stringify(res));
+        }   
+    }
+    else {
       localStorage.setItem("user", JSON.stringify(customMsg));
       return customMsg;
     }
