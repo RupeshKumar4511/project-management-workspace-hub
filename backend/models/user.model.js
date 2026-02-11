@@ -5,7 +5,7 @@ import {pgTable} from 'drizzle-orm/pg-core'
 import {sql} from 'drizzle-orm'
 
 
-export const roleEnum = pgEnum('role',["admin","member"])
+export const roleEnum = pgEnum('role',["admin","member","guest"])
 export const providerEnum = pgEnum('provider',["github","google"])
 
 export const users =  pgTable("users",{
