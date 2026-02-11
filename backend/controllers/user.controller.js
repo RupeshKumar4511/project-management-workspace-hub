@@ -80,6 +80,11 @@ export const login = async (req, res) => {
             return res.status(401).send(errorMsg)
         }
 
+        const [dbToken] = await db.select().from(tokens).where(eq(tokens.userId, user.id))
+
+        if(dbToken){
+            await db.delete(tokens).where(eq(tokens.userId,user.id))
+        }
 
         const accessToken = generateAccessToken(user);
         const refreshToken = generateRefreshToken(user);
@@ -87,6 +92,7 @@ export const login = async (req, res) => {
         const expiresAt = new Date(Date.now() + 1000 * 60 * 60 * 24 * 7);
 
         await db.insert(tokens).values({ userId: user.id, refreshToken:refreshToken, expiredAt: expiresAt })
+
 
         res.cookie("accessToken", accessToken, options)
         res.cookie("refreshToken",refreshToken, options)
@@ -120,7 +126,7 @@ export const generateNewRefreshToken = async (req, res) => {
         }       
 
         if (dbToken?.refreshToken !== token) {
-            return res.status(403).send({ message: "your refresh token is expired or used" })
+            return res.status(403).send({ success:false, message: "your refresh token is expired or used", code:"SIGNED_OUT" })
         }
 
         const accessToken = generateAccessToken(decodedData)
@@ -160,7 +166,9 @@ export const logOut = async (req, res) => {
         }
 
         if (refreshToken && dbToken.refreshToken !== refreshToken) {
-            return res.status(403).send({ message: "your refresh token is expired or used" })
+            res.clearCookie("accessToken")
+            res.clearCookie("refreshToken")
+            return res.status(403).send({success:false, message: "your refresh token is expired or used",code:"SIGNED_OUT" })
         }
 
         await db.delete(tokens).where(eq(tokens.userId, decodedData.id));
