@@ -14,7 +14,8 @@ export const users =  pgTable("users",{
     email:varchar('email',{length:255}).notNull().unique(),
     password:text('password').notNull(),
     role:roleEnum('role').default('member').notNull(),
-    createdAt:timestamp("created_at").notNull().defaultNow()
+    createdAt:timestamp("created_at").notNull().defaultNow(),
+    updatedAt:timestamp('updated_at').notNull().defaultNow()
 },(users)=>[
     uniqueIndex('unique_user').on(users.email),
     check('email_regex',sql`${users.email}~'^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$'`)
