@@ -12,8 +12,6 @@ Node.js + Express.js
 <br>
 PostgreSQL
 <br>
-MongoDB
-<br>
 Redis
 <br>
 Kafka
