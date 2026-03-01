@@ -13,8 +13,6 @@ Node.js + Express.js
 PostgreSQL
 <br>
 Redis
-<br>
-Kafka
 
 
 # Frontend Reference : 
