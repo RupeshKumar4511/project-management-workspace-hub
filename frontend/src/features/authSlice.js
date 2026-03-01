@@ -169,6 +169,14 @@ const authSlice = createSlice({
         },
         updateLogoutResponse:(state)=>{
             state.error.logoutError = '';   
+        },
+        updateSignUpResponse: (state)=>{
+            state.response = {},
+            state.error.signUpError = ""
+        },
+        updateVerifyUserResponse: (state)=>{
+            state.verifyUserResponse = {},
+            state.error.verifyUserError = ""
         }
     },
     extraReducers: (builder => {
