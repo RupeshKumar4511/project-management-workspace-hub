@@ -1,5 +1,6 @@
 import { serial, varchar,timestamp, pgTable,text, pgEnum,integer } from "drizzle-orm/pg-core";
 import { users } from "./user.model.js";
+import { uniqueIndex } from "drizzle-orm/gel-core";
 
 export const workspaceRoleEnum = pgEnum("workspace_user_role",["admin","member"])
 export const taskStatusEnum = pgEnum('task_status',['To Do','In Progress','Done'])
@@ -10,23 +11,25 @@ export const priorityEnum = pgEnum('priority',['Medium','Low','High'])
 
 export const workspaces = pgTable("workspaces",{
     id:serial("id").primaryKey().notNull(),
-    image:varchar("image",{length:1500}).notNull(),
     workspaceName:varchar("workspace_name",{length:32}).notNull().unique(),
     description:varchar("description",{length:255}).notNull(),
-    workspacePassword:text("workspace_password").notNull(),
     createdBy:varchar("created_by",{length:32}).references(()=>users.username,{onDelete:'cascade',onUpdate:'cascade'}),
     createdAt:timestamp('created_at').defaultNow().notNull(),
     updatedAt:timestamp('updated_at').notNull().defaultNow()
-})
+},(workspaces)=>[
+    uniqueIndex('workspace_index').on(workspaces.workspaceName,workspaces.createdBy)
+])
 
 export const workspaceUsers = pgTable('workspace_users',{
     id:serial("id").notNull().primaryKey(),
     workspaceName:varchar("workspace_name",{length:32}).notNull().references(()=>workspaces.workspaceName,{onDelete:'cascade',onUpdate:'cascade'}),
-    username:varchar("username",{length:32}).notNull().references(()=>users.username,{onDelete:'cascade',onUpdate:'cascade'}),
+    username:varchar("username",{length:32}).notNull().references(()=>users.username,{onDelete:'cascade',onUpdate:'cascade'}).unique(),
     role:workspaceRoleEnum('role').default('member').notNull(),
     createdAt:timestamp("created_at").notNull().defaultNow(),
     updatedAt:timestamp('updated_at').notNull().defaultNow()
-})
+},(workspaceUsers)=>[
+    uniqueIndex('workspace_users_index').on(workspaceUsers.workspaceName,workspaceUsers.username)
+])
 
 export const projects = pgTable('projects',{
     id:serial("id").notNull().primaryKey(),
@@ -42,7 +45,9 @@ export const projects = pgTable('projects',{
     progress:integer("progress",{max:100,min:0}).default(0),
     createdAt:timestamp("created_at").notNull().defaultNow(),
     updatedAt:timestamp('updated_at').notNull().defaultNow()
-})
+},(projects)=>[
+    uniqueIndex('project_index').on(projects.workspaceName,projects.title)
+])
 
 export const projectMembers = pgTable('project_members',{
     id:serial("id").notNull().primaryKey(),
@@ -63,5 +68,16 @@ export const tasks = pgTable('tasks',{
     dueDate:timestamp('due_date').notNull(),
     createdAt:timestamp("created_at").notNull().defaultNow(),
     updatedAt:timestamp('updated_at').notNull().defaultNow()
+    
+},(tasks)=>[
+    uniqueIndex('tasks_index').on(tasks.projectId,tasks.title)
+])
+
+export const comments = pgTable('comments',{
+    id:serial("id").notNull().primaryKey(),
+    taskId:serial("task_id").notNull().references(()=>tasks.id,{onDelete:'cascade'}),
+    content:text("content").notNull(),
+    username:varchar("username",{length:32}).notNull().references(()=>workspaceUsers.username,{onDelete:'cascade',onUpdate:'cascade'}),
+    createdAt:timestamp("created_at").notNull().defaultNow()
     
 })

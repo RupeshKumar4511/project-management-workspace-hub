@@ -3,6 +3,7 @@ import { serial, varchar,text } from 'drizzle-orm/pg-core'
 import {pgTable} from 'drizzle-orm/pg-core'
 
 import {sql} from 'drizzle-orm'
+import { index } from 'drizzle-orm/gel-core'
 
 
 export const roleEnum = pgEnum('role',["admin","member","guest"])
@@ -18,6 +19,7 @@ export const users =  pgTable("users",{
     updatedAt:timestamp('updated_at').notNull().defaultNow()
 },(users)=>[
     uniqueIndex('unique_user').on(users.email),
+    uniqueIndex('unique_email').on(users.email),
     check('email_regex',sql`${users.email}~'^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$'`)
 ])
 
@@ -37,4 +39,6 @@ export const tokens = pgTable("tokens",{
     refreshToken:varchar("refresh_token").notNull(),
     createdAt:timestamp("created_at").defaultNow().notNull(),
     expiredAt:timestamp("expired_at").notNull()
-})
+},(tokens)=>[
+    index('user_Id_index').on(tokens.userId)
+])
