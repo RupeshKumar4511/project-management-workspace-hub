@@ -24,8 +24,6 @@ export default function CreateWorkspaceForm() {
     reset({
       workspaceName: '',
       description: '',
-      workspacePassword: '',
-      adminPassword: '',
     });
     dispatch(updateCreateWorkspaceResponse())
     setTimeout(()=>{
@@ -88,24 +86,6 @@ export default function CreateWorkspaceForm() {
           />
           <span className="text-red-500 md:text-sm text-[12px] ">{errors.description?.message}</span>
         </div>
-
-        <div className="md:col-span-2">
-          <label className="text-sm text-gray-600">Workspace Password</label>
-          <input
-            type="password"
-            name="workspacePassword"
-            placeholder="Set a secure password for workspace"
-            className="mt-1 w-full rounded-xl border border-gray-300 px-4 py-3 focus:outline-none focus:ring-2 focus:ring-indigo-400"
-            {...register("workspacePassword", {
-              required: "workspacePassword is required",
-              minLength: {
-                value: 8, message: "Length of workspacePassword must be atleast 8 characters long."
-              }
-            })}
-          />
-          <span className="text-red-500 md:text-sm text-[12px] ">{errors.workspacePassword?.message}</span>
-        </div>
-
 
         <button
           type="submit"

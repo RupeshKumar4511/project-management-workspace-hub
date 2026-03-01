@@ -1,7 +1,7 @@
 import { useEffect, useState, useRef } from 'react';
 import { useForm } from "react-hook-form";
 import { Link, useLocation, useNavigate } from 'react-router-dom';
-import { signUp } from '../features/authSlice';
+import { authActions, signUp } from '../features/authSlice';
 import { useDispatch, useSelector } from 'react-redux';
 import ErrorPage from './ErrorPage';
 import SuccessModal from './SuccessModal';
@@ -46,6 +46,7 @@ export default function CreateUser() {
 
     const handleClick = (setOpen) => {
         setOpen(false);
+        dispatch(authActions.updateSignUpResponse());
         setTimeout(() => {
             navigate('/');
         }, 0);
@@ -56,7 +57,6 @@ export default function CreateUser() {
     }
 
     if (response.success === true) {
-        // dispatch(authActions.updateSendMailResponse());
         return (<SuccessModal handleClick={handleClick} message={"Success! Please log in."} />
         )
 

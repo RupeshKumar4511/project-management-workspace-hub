@@ -17,6 +17,7 @@ const ResetPassword = () => {
   const { handleSubmit, register, formState: { errors } } = useForm();
   const onSubmit = (data) => {
     dispatch(resetPassword({ ...state, ...data }))
+    dispatch(authActions.updateVerifyUserResponse());
   }
   
 

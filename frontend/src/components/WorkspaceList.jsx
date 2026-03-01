@@ -59,25 +59,6 @@ export default function WorkspaceList() {
             <span className="text-red-500 md:text-sm text-[12px] ">{errors.workspaceName?.message}</span>
           </div>
 
-          <div>
-            <label className="block text-sm font-medium text-gray-600 mb-1">
-              Workspace Password
-            </label>
-            <input
-              type="password"
-              name="workspacePassword"
-              placeholder="Enter workspace password"
-              className="w-full rounded-xl border border-gray-300 px-4 py-3 focus:outline-none focus:ring-2 focus:ring-indigo-400"
-              {...register("workspacePassword", {
-                required: "workspacePassword is required",
-                minLength: {
-                  value: 8, message: "Length of workspacePassword must be atleast 8 characters long."
-                }
-              })}
-            />
-            <span className="text-red-500 md:text-sm text-[12px] ">{errors.workspacePassword?.message}</span>
-          </div>
-
           <button
             type="submit"
             className="w-full rounded-xl bg-indigo-600 py-3 text-white font-medium hover:bg-indigo-700 transition"
