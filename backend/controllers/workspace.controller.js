@@ -8,6 +8,7 @@ export const createWorkspace = async(req,res)=>{
     const {workspaceName,createdBy,description,workspacePassword,adminEmail} = req.body;
     
     try {
+        const image = req.files[0];
         const [workspace] = await db.select({name:workspaces.workspaceName}).from(workspaces).where(eq(workspaces.workspaceName,workspaceName));
 
         if(workspace){
@@ -32,9 +33,9 @@ export const createWorkspace = async(req,res)=>{
 
         await db.transaction(async (tx) => {
             const password = await bcrypt.hash(workspacePassword,10)
-            await tx.insert(workspaces).values({workspaceName,createdBy,description,workspacePassword:password})
+            await tx.insert(workspaces).values({workspaceName,image,createdBy,description,workspacePassword:password})
 
-            await tx.insert(workspaceUsers).values({workspaceName,username:createdBy,email:adminEmail,role:'admin'})
+            await tx.insert(workspaceUsers).values({workspaceName,username:user.username,role:'admin'})
         })
         
 
@@ -101,6 +102,11 @@ export const addTeamMemberToProject = async(req,res)=>{
 // Create Task in a project and invite to team member 
 export const createTask = async(req,res)=>{
 
+}
+
+// update Workspace 
+export const updateWorkspace = async(req,res)=>{
+    
 }
 
 // Update Projects 
