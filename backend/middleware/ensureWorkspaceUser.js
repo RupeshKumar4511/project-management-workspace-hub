@@ -5,7 +5,7 @@ import { workspaceUsers } from "../models/workspace.model.js";
 const ensureWorkspaceUser = async (req, res, next) => {
     const {workspaceName} = req.body;
     try {
-        const [workspaceUser] = await db.select({ username: workspaceUsers.username,role:workspaceUsers.role , workspaceName: workspaceUsers.workspaceName}).from(workspaceUsers).where(and(eq(workspaceUsers.username, req.user.username), eq(workspaceUsers.workspaceName, workspaceName)));
+        const [workspaceUser] = await db.select({ email: workspaceUsers.email,role:workspaceUsers.role , workspaceName: workspaceUsers.workspaceName}).from(workspaceUsers).where(and(eq(workspaceUsers.email, req.user.email), eq(workspaceUsers.workspaceName, workspaceName)));
 
         if (!workspaceUser) {
             return res.status(401).send({ success: false, message: `Unauthorized Request` })
