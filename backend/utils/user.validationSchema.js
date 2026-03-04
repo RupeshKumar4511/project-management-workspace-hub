@@ -1,6 +1,7 @@
 export const loginSchema = {
     username: {
         trim:true,
+        toLowerCase:true,
         notEmpty: {
             errorMessage: "Username is required."
         },
@@ -12,7 +13,7 @@ export const loginSchema = {
                 min: 3,
                 max: 255
             },
-            errorMessage: "Username must be atleast 3-255 characters long."
+            errorMessage: "Username must be between 3 and 255 characters long."
         }
     },
     password: {
@@ -28,7 +29,7 @@ export const loginSchema = {
                 min: 8,
                 max: 32
             },
-            errorMessage: "password must be atleast 8-32 characters long."
+            errorMessage: "password must be between 8 and 32 characters long."
         },
         matches: {
             options: [/^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?&])[A-Za-z\d@$!%*?&]{8,}$/],
@@ -57,6 +58,7 @@ export const signUpSchema = {
     },
     username: {
         trim:true,
+        toLowerCase: true,
         notEmpty: {
             errorMessage: "Username is required."
         },
@@ -68,7 +70,7 @@ export const signUpSchema = {
                 min: 3,
                 max: 32
             },
-            errorMessage: "Username must be atleast 3-32 characters long."
+            errorMessage: "Username must be between 3 and 32 characters long."
         }
     },
     email: {
@@ -84,7 +86,7 @@ export const signUpSchema = {
                 min: 8,
                 max: 255
             },
-            errorMessage: "email must be atleast 8-255 characters long."
+            errorMessage: "email must be between 8 and 255 characters long."
         },
         matches: {
             options: [/^[^\s@]+@[^\s@]+\.[^\s@]+$/],
@@ -104,7 +106,7 @@ export const signUpSchema = {
                 min: 8,
                 max: 32
             },
-            errorMessage: "password must be atleast 8-32 characters long."
+            errorMessage: "password must be between 8 and 32 characters long."
         },
         matches: {
             options: [/^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?&])[A-Za-z\d@$!%*?&]{8,}$/],
@@ -144,7 +146,7 @@ export const resetPasswordSchema = {
                 min: 8,
                 max: 255
             },
-            errorMessage: "email must be atleast 8-32 characters long."
+            errorMessage: "email must be between 8 and 32 characters long."
         }
     },
     password: {
@@ -160,7 +162,7 @@ export const resetPasswordSchema = {
                 min: 8,
                 max: 32
             },
-            errorMessage: "password must be atleast 8-32 characters long."
+            errorMessage: "password must be between 8 and 32 characters long."
         },
         matches: {
             options: [/^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?&])[A-Za-z\d@$!%*?&]{8,}$/],
@@ -185,7 +187,7 @@ export const verifyUserSchema = {
                 min: 8,
                 max: 255
             },
-            errorMessage: "email must be atleast 8-255 characters long."
+            errorMessage: "email must be between 8 and 255 characters long."
         },
         matches: {
             options: [/^[^\s@]+@[^\s@]+\.[^\s@]+$/],
