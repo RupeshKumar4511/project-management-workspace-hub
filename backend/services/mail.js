@@ -77,6 +77,7 @@ export const sendMemberInvitation = async (body) => {
             <h2>Welcome to Workspace Hub </h2>
             <p>You can join ${workspaceName} by using following credentials : </p>
             <h3>Username is ${username}</h3>
+            <p>You can also use your email as username</p>
             <h3>Password is ${password}</h3>
             <strong>You are requested to please reset your username and password for security purpose.</strong>
         </div>`
@@ -89,7 +90,7 @@ export const sendMemberInvitation = async (body) => {
 }
 
 export const sendTaskInvitation = async (body) => {
-    const { email, title, description } = body;
+    const { email, title, description,workspaceName } = body;
 
     const mailOptions = {
         from: process.env.EMAIL,
@@ -105,6 +106,4 @@ export const sendTaskInvitation = async (body) => {
 
     const response = await transporter.sendMail(mailOptions);
     console.log(response);
-
-
 }
