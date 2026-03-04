@@ -1,6 +1,7 @@
-import { serial, varchar,timestamp, pgTable,text, pgEnum,integer } from "drizzle-orm/pg-core";
+import { uuid, varchar,timestamp, pgTable,text, pgEnum,integer } from "drizzle-orm/pg-core";
 import { users } from "./user.model.js";
 import { uniqueIndex } from "drizzle-orm/gel-core";
+import { sql } from "drizzle-orm";
 
 export const workspaceRoleEnum = pgEnum("workspace_user_role",["admin","member"])
 export const taskStatusEnum = pgEnum('task_status',['To Do','In Progress','Done'])
@@ -10,74 +11,74 @@ export const priorityEnum = pgEnum('priority',['Medium','Low','High'])
 
 
 export const workspaces = pgTable("workspaces",{
-    id:serial("id").primaryKey().notNull(),
+    id:uuid("id").primaryKey().defaultRandom(),
     workspaceName:varchar("workspace_name",{length:32}).notNull().unique(),
     description:varchar("description",{length:255}).notNull(),
-    createdBy:varchar("created_by",{length:32}).references(()=>users.username,{onDelete:'cascade',onUpdate:'cascade'}),
+    adminEmail:varchar("admin_email",{length:255}).references(()=>users.email,{onDelete:'cascade'}),
     createdAt:timestamp('created_at').defaultNow().notNull(),
     updatedAt:timestamp('updated_at').notNull().defaultNow()
 },(workspaces)=>[
-    uniqueIndex('workspace_index').on(workspaces.workspaceName,workspaces.createdBy)
+    uniqueIndex('workspace_index').on(sql`lower(${workspaces.workspaceName})`,workspaces.createdBy)
 ])
 
 export const workspaceUsers = pgTable('workspace_users',{
-    id:serial("id").notNull().primaryKey(),
+    id:uuid("id").notNull().primaryKey().defaultRandom(),
     workspaceName:varchar("workspace_name",{length:32}).notNull().references(()=>workspaces.workspaceName,{onDelete:'cascade',onUpdate:'cascade'}),
-    username:varchar("username",{length:32}).notNull().references(()=>users.username,{onDelete:'cascade',onUpdate:'cascade'}).unique(),
+    userEmail:varchar("user_email",{length:255}).notNull().references(()=>users.email,{onDelete:'cascade'}).unique(),
     role:workspaceRoleEnum('role').default('member').notNull(),
     createdAt:timestamp("created_at").notNull().defaultNow(),
     updatedAt:timestamp('updated_at').notNull().defaultNow()
 },(workspaceUsers)=>[
-    uniqueIndex('workspace_users_index').on(workspaceUsers.workspaceName,workspaceUsers.username)
+    uniqueIndex('workspace_users_index').on(sql`lower(${workspaceUsers.workspaceName})`,workspaceUsers.userEmail)
 ])
 
 export const projects = pgTable('projects',{
-    id:serial("id").notNull().primaryKey(),
+    id:uuid("id").notNull().primaryKey().defaultRandom(),
     title:varchar("title",{length:255}).notNull(),
     workspaceName:varchar("workspace_name",{length:32}).notNull().references(()=>workspaces.workspaceName,{onDelete:'cascade',onUpdate:'cascade'}),
     projectLink: text("project_link"),
     description:varchar("description",{length:1000}).notNull(),
     status:projectStatusEnum('status').notNull(),
     priority:priorityEnum("priority").notNull(),
-    projectLead:varchar("project_lead",{length:32}).notNull().references(()=>workspaceUsers.username,{onDelete:'cascade',onUpdate:'cascade'}),
+    projectLead:varchar("project_lead",{length:255}).notNull().references(()=>workspaceUsers.userEmail,{onDelete:'cascade',onUpdate:'cascade'}),
     startDate:timestamp('start_date').defaultNow(),
     endDate:timestamp('end_date').notNull(),
     progress:integer("progress",{max:100,min:0}).default(0),
     createdAt:timestamp("created_at").notNull().defaultNow(),
     updatedAt:timestamp('updated_at').notNull().defaultNow()
 },(projects)=>[
-    uniqueIndex('project_index').on(projects.workspaceName,projects.title)
+    uniqueIndex('project_index').on(sql`lower(${projects.workspaceName})`,sql`lower(${projects.title})`)
 ])
 
 export const projectMembers = pgTable('project_members',{
-    id:serial("id").notNull().primaryKey(),
-    username:varchar("workspace_username",{length:32}).notNull().references(()=>workspaceUsers.username,{onDelete:'cascade',onUpdate:'cascade'}),
+    id:uuid("id").notNull().primaryKey().defaultRandom(),
+    userEmail:varchar("workspace_user_email",{length:255}).notNull().references(()=>workspaceUsers.email,{onDelete:'cascade',onUpdate:'cascade'}),
     projectId:integer("project_id").notNull().references(()=>projects.id,{onDelete:'cascade'}),
 
 })
 
 export const tasks = pgTable('tasks',{
-    id:serial("id").notNull().primaryKey(),
+    id:uuid("id").notNull().primaryKey().defaultRandom(),
     title:varchar("title",{length:255}).notNull(),
-    projectId:serial("project_id").notNull().references(()=>projects.id,{onDelete:'cascade'}),
+    projectId:uuid("project_id").notNull().references(()=>projects.id,{onDelete:'cascade'}),
     description:varchar("description",{length:1000}).notNull(),
     type:taskTypeEnum("type").notNull(),
     priority:priorityEnum("priority").notNull(),
     status:taskStatusEnum("status").notNull(),
-    assignee:varchar("assignee",{length:32}).notNull().references(()=>workspaceUsers.username,{onDelete:'cascade',onUpdate:'cascade'}),
+    assignee:varchar("assignee",{length:255}).notNull().references(()=>workspaceUsers.email,{onDelete:'cascade',onUpdate:'cascade'}),
     dueDate:timestamp('due_date').notNull(),
     createdAt:timestamp("created_at").notNull().defaultNow(),
     updatedAt:timestamp('updated_at').notNull().defaultNow()
     
 },(tasks)=>[
-    uniqueIndex('tasks_index').on(tasks.projectId,tasks.title)
+    uniqueIndex('tasks_index').on(tasks.projectId,sql`lower(${tasks.title})`)
 ])
 
 export const comments = pgTable('comments',{
-    id:serial("id").notNull().primaryKey(),
-    taskId:serial("task_id").notNull().references(()=>tasks.id,{onDelete:'cascade'}),
+    id:uuid("id").notNull().primaryKey().defaultRandom(),
+    taskId:uuid("task_id").notNull().references(()=>tasks.id,{onDelete:'cascade'}),
     content:text("content").notNull(),
-    username:varchar("username",{length:32}).notNull().references(()=>workspaceUsers.username,{onDelete:'cascade',onUpdate:'cascade'}),
+    username:varchar("username",{length:32}).notNull().references(()=>users.username,{onDelete:'cascade',onUpdate:'cascade'}),
     createdAt:timestamp("created_at").notNull().defaultNow()
     
 })
