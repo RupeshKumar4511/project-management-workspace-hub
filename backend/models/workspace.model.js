@@ -1,7 +1,7 @@
 import { uuid, varchar,timestamp, pgTable,text, pgEnum,integer } from "drizzle-orm/pg-core";
 import { users } from "./user.model.js";
 import { uniqueIndex } from "drizzle-orm/gel-core";
-import { sql } from "drizzle-orm";
+import { sql,relations } from "drizzle-orm";
 
 export const workspaceRoleEnum = pgEnum("workspace_user_role",["admin","member"])
 export const taskStatusEnum = pgEnum('task_status',['To Do','In Progress','Done'])
@@ -82,3 +82,33 @@ export const comments = pgTable('comments',{
     createdAt:timestamp("created_at").notNull().defaultNow()
     
 })
+
+export const workspacesRelations = relations(workspaces, ({ many }) => ({
+  projects: many(projects),
+}));
+
+
+export const projectsRelations = relations(projects, ({ one, many }) => ({
+  workspace: one(workspaces, {
+    fields: [projects.workspaceName],
+    references: [workspaces.workspaceName],
+  }),
+  tasks: many(tasks),
+  projectMembers: many(projectMembers), 
+}));
+
+
+export const projectMembersRelations = relations(projectMembers, ({ one }) => ({
+  project: one(projects, {
+    fields: [projectMembers.projectId],
+    references: [projects.id],
+  })
+}));
+
+
+export const tasksRelations = relations(tasks, ({ one }) => ({
+  project: one(projects, {
+    fields: [tasks.projectId],
+    references: [projects.id],
+  }),
+}));
