@@ -1,5 +1,4 @@
-import { index, uuid } from 'drizzle-orm/gel-core';
-import { pgTable, varchar, uuid, timestamp, text } from 'drizzle-orm/pg-core'
+import { pgTable, varchar, uuid, timestamp, text,index } from 'drizzle-orm/pg-core'
 const otpModel = pgTable("otps", {
     id: uuid("id").primaryKey().defaultRandom(),
     emailId: varchar("email_Id", { length: 255 }).notNull(),

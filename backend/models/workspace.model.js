@@ -1,60 +1,66 @@
-import { uuid, varchar,timestamp, pgTable,text, pgEnum,integer,uniqueIndex } from "drizzle-orm/pg-core";
+import { uuid, varchar,timestamp, pgTable,text, pgEnum,integer,uniqueIndex,index } from "drizzle-orm/pg-core";
 import { users } from "./user.model.js";
 import { sql,relations } from "drizzle-orm";
 
-export const workspaceRoleEnum = pgEnum("workspace_user_role",["admin","member"])
-export const taskStatusEnum = pgEnum('task_status',['To Do','In Progress','Done'])
-export const projectStatusEnum = pgEnum('project_status',['Planning','Active','Completed','On Hold','Cancelled'])
-export const taskTypeEnum = pgEnum('task_type',['Task','Feature','Bug','Improvement','Other'])
-export const priorityEnum = pgEnum('priority',['Medium','Low','High'])
+export const workspaceRoleEnum = pgEnum("workspace_user_role",["org:admin","org:member"])
+export const taskStatusEnum = pgEnum('task_status',['TODO','IN_PROGRESS','DONE'])
+export const projectStatusEnum = pgEnum('project_status',['PLANNING','ACTIVE','COMPLETED','ON_HOLD','CANCELLED'])
+export const taskTypeEnum = pgEnum('task_type',['TASK','FEATURE','BUG','IMPROVEMENT','OTHER'])
+export const priorityEnum = pgEnum('priority',['MEDIUM','LOW','HIGH'])
 
 
 export const workspaces = pgTable("workspaces",{
     id:uuid("id").primaryKey().defaultRandom(),
-    workspaceName:varchar("workspace_name",{length:32}).notNull().unique(),
+    name:varchar("name",{length:32}).notNull(),
     description:varchar("description",{length:255}).notNull(),
-    adminEmail:varchar("admin_email",{length:255}).references(()=>users.email,{onDelete:'cascade'}),
-    createdAt:timestamp('created_at').defaultNow().notNull(),
-    updatedAt:timestamp('updated_at').notNull().defaultNow()
-},(workspaces)=>[
-    uniqueIndex('workspace_index').on(sql`lower(${workspaces.workspaceName})`,workspaces.adminEmail)
+    ownerId:uuid("owner_id").notNull().references(()=>users.id,{onDelete:'cascade'}),
+    createdAt:timestamp('created_at', { withTimezone: true }).defaultNow().notNull(),
+    updatedAt:timestamp('updated_at', { withTimezone: true }).notNull().defaultNow().$onUpdate(() => new Date()),
+    deletedAt: timestamp('deleted_at', { withTimezone: true }),
+},(table)=>[
+    uniqueIndex('workspace_name_idx').on(sql`lower(${table.name})`,table.ownerId),
+    index("workspace_owner_id_idx").on(table.ownerId)
 ])
 
 export const workspaceUsers = pgTable('workspace_users',{
     id:uuid("id").notNull().primaryKey().defaultRandom(),
-    workspaceName:varchar("workspace_name",{length:32}).notNull().references(()=>workspaces.workspaceName,{onDelete:'cascade',onUpdate:'cascade'}),
-    userEmail:varchar("user_email",{length:255}).notNull().references(()=>users.email,{onDelete:'cascade'}).unique(),
-    role:workspaceRoleEnum('role').default('member').notNull(),
-    createdAt:timestamp("created_at").notNull().defaultNow(),
-    updatedAt:timestamp('updated_at').notNull().defaultNow()
-},(workspaceUsers)=>[
-    uniqueIndex('workspace_users_index').on(sql`lower(${workspaceUsers.workspaceName})`,workspaceUsers.userEmail)
+    workspaceId:uuid("workspace_id").notNull().references(()=>workspaces.id,{onDelete:'cascade'}),
+    userId:uuid("user_id").notNull().references(()=>users.id,{onDelete:'cascade'}),
+    role:workspaceRoleEnum('role').default('org:member').notNull(),
+    createdAt:timestamp("created_at", { withTimezone: true }).notNull().defaultNow(),
+    updatedAt:timestamp('updated_at', { withTimezone: true }).notNull().defaultNow().$onUpdate(() => new Date()),
+    deletedAt:timestamp('deletedAt', { withTimezone: true })
+},(table)=>[
+    uniqueIndex('workspace_users_index').on(table.workspaceId,table.userId),
+    index('workspace_user_id_idx').on(table.userId)
 ])
 
 export const projects = pgTable('projects',{
     id:uuid("id").notNull().primaryKey().defaultRandom(),
     title:varchar("title",{length:255}).notNull(),
-    workspaceName:varchar("workspace_name",{length:32}).notNull().references(()=>workspaces.workspaceName,{onDelete:'cascade',onUpdate:'cascade'}),
+    workspaceId:uuid("workspace_id").notNull().references(()=>workspaces.id,{onDelete:'cascade'}),
     projectLink: text("project_link"),
     description:varchar("description",{length:1000}).notNull(),
     status:projectStatusEnum('status').notNull(),
     priority:priorityEnum("priority").notNull(),
-    projectLead:varchar("project_lead",{length:255}).notNull().references(()=>workspaceUsers.userEmail,{onDelete:'cascade',onUpdate:'cascade'}),
+    projectLead:uuid("project_lead").references(()=>workspaceUsers.id,{onDelete:'set null'}),
     startDate:timestamp('start_date').defaultNow(),
     endDate:timestamp('end_date').notNull(),
-    progress:integer("progress",{max:100,min:0}).default(0),
-    createdAt:timestamp("created_at").notNull().defaultNow(),
-    updatedAt:timestamp('updated_at').notNull().defaultNow()
-},(projects)=>[
-    uniqueIndex('project_index').on(sql`lower(${projects.workspaceName})`,sql`lower(${projects.title})`)
+    createdAt:timestamp("created_at", { withTimezone: true }).notNull().defaultNow(),
+    updatedAt:timestamp('updated_at', { withTimezone: true }).notNull().defaultNow().$onUpdate(() => new Date()),
+},(table)=>[
+    uniqueIndex('project_workspace_title_idx').on(table.workspaceId,sql`lower(${table.title})`),
+    index('project_lead_id_idx').on(table.projectLead),
 ])
 
 export const projectMembers = pgTable('project_members',{
     id:uuid("id").notNull().primaryKey().defaultRandom(),
-    userEmail:varchar("workspace_user_email",{length:255}).notNull().references(()=>workspaceUsers.userEmail,{onDelete:'cascade',onUpdate:'cascade'}),
-    projectId:uuid("project_id").notNull().references(()=>projects.id,{onDelete:'cascade'}),
-
-})
+    userId:uuid("user_id").notNull().references(()=>workspaceUsers.id,{onDelete:'cascade'}),
+    projectId:uuid("project_id").notNull().references(()=>projects.id,{onDelete:'cascade'}),  
+},(table)=>[
+    uniqueIndex('project_member_unique_idx').on(table.userId,table.projectId),
+    index('project_member_project_id_idx').on(table.projectId),
+])
 
 export const tasks = pgTable('tasks',{
     id:uuid("id").notNull().primaryKey().defaultRandom(),
@@ -64,46 +70,54 @@ export const tasks = pgTable('tasks',{
     type:taskTypeEnum("type").notNull(),
     priority:priorityEnum("priority").notNull(),
     status:taskStatusEnum("status").notNull(),
-    assignee:varchar("assignee",{length:255}).notNull().references(()=>workspaceUsers.userEmail,{onDelete:'cascade',onUpdate:'cascade'}),
+    assigneeId:uuid("assignee_id").references(()=>workspaceUsers.id,{onDelete:'set null'}),
     dueDate:timestamp('due_date').notNull(),
-    createdAt:timestamp("created_at").notNull().defaultNow(),
-    updatedAt:timestamp('updated_at').notNull().defaultNow()
+    createdAt:timestamp("created_at", { withTimezone: true }).notNull().defaultNow(),
+    updatedAt:timestamp('updated_at', { withTimezone: true }).notNull().defaultNow().$onUpdate(() => new Date()),
     
-},(tasks)=>[
-    uniqueIndex('tasks_index').on(tasks.projectId,sql`lower(${tasks.title})`)
+},(table)=>[
+    uniqueIndex('tasks_index').on(table.projectId,sql`lower(${table.title})`),
+    index('tasks_assignee_id_idx').on(table.assigneeId)
 ])
 
 export const comments = pgTable('comments',{
     id:uuid("id").notNull().primaryKey().defaultRandom(),
     taskId:uuid("task_id").notNull().references(()=>tasks.id,{onDelete:'cascade'}),
     content:text("content").notNull(),
-    username:varchar("username",{length:32}).notNull().references(()=>users.username,{onDelete:'cascade',onUpdate:'cascade'}),
-    createdAt:timestamp("created_at").notNull().defaultNow()
-    
-})
+    authorId:uuid("author_id").notNull().references(()=>workspaceUsers.id,{onDelete:'cascade'}),
+    createdAt:timestamp("created_at").notNull().defaultNow()  
+},(table)=>[
+    index('comments_tasks_id_index').on(table.taskId),
+])
 
-export const workspacesRelations = relations(workspaces, ({ many }) => ({
+export const workspacesRelations = relations(workspaces, ({ one, many }) => ({
+  owner: one(users, {
+    fields: [workspaces.ownerId],
+    references: [users.id],
+  }),
   projects: many(projects),
   workspaceUsers: many(workspaceUsers)
 }));
 
 export const workspaceUsersRelations = relations(workspaceUsers, ({ one }) => ({
+  user: one(users, {
+    fields: [workspaceUsers.userId],
+    references: [users.id],
+  }),
   workspace: one(workspaces, {
-    fields: [workspaceUsers.workspaceName],
-    references: [workspaces.workspaceName],
+    fields: [workspaceUsers.workspaceId],
+    references: [workspaces.id],
   }),
 }));
 
-
 export const projectsRelations = relations(projects, ({ one, many }) => ({
   workspace: one(workspaces, {
-    fields: [projects.workspaceName],
-    references: [workspaces.workspaceName],
+    fields: [projects.workspaceId],
+    references: [workspaces.id],
   }),
   tasks: many(tasks),
   projectMembers: many(projectMembers), 
 }));
-
 
 export const projectMembersRelations = relations(projectMembers, ({ one }) => ({
   project: one(projects, {
@@ -112,10 +126,20 @@ export const projectMembersRelations = relations(projectMembers, ({ one }) => ({
   })
 }));
 
-
 export const tasksRelations = relations(tasks, ({ one }) => ({
   project: one(projects, {
     fields: [tasks.projectId],
     references: [projects.id],
+  }),
+}));
+
+export const commentsRelations = relations(comments, ({ one }) => ({
+  task: one(tasks, {
+    fields: [comments.taskId],
+    references: [tasks.id],
+  }),
+  workspaceAuthor: one(workspaceUsers, {
+    fields: [comments.authorId],
+    references: [workspaceUsers.id],
   }),
 }));
