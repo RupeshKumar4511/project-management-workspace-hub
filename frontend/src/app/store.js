@@ -1,12 +1,13 @@
 import { configureStore } from '@reduxjs/toolkit'
-import workspaceReducer from '../features/workspaceSlice'
+import {workspace} from '../features/workspaceSlice'
 import themeReducer from '../features/themeSlice'
 import authSlice from '../features/authSlice'
 
 export const store = configureStore({
     reducer: {
-        workspace: workspaceReducer,
         theme: themeReducer,
-        auth:authSlice.reducer
+        auth:authSlice.reducer,
+        [workspace.reducerPath]: workspace.reducer
     },
+    middleware:(getDefaultMiddleware)=>getDefaultMiddleware().concat(workspace.middleware)
 })
