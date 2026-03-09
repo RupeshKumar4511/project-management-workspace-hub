@@ -1,7 +1,8 @@
 import { useState } from "react";
 import { Mail, UserPlus } from "lucide-react";
-import { useSelector } from "react-redux";
 import { useSearchParams } from "react-router-dom";
+import { useGetWorkspaceDetailsQuery } from "../features/workspaceSlice";
+import LoadingSpinner from "./LoadingSpinner";
 
 const AddProjectMember = ({ isDialogOpen, setIsDialogOpen }) => {
 
@@ -9,18 +10,27 @@ const AddProjectMember = ({ isDialogOpen, setIsDialogOpen }) => {
 
     const id = searchParams.get('id');
 
-    const currentWorkspace = useSelector((state) => state.workspace?.currentWorkspace || null);
+    const { data: currentWorkspace, isLoading, error } = useGetWorkspaceDetailsQuery();
 
-    const project = currentWorkspace?.projects.find((p) => p.id === id);
-    const projectMembersEmails = project?.members.map((member) => member.user.email);
+    const project = currentWorkspace?.details.projects.find((p) => p.id === id);
+    const projectMembersEmails = project?.projectMembers.map((member) => member.user.email);
 
     const [email, setEmail] = useState('');
     const [isAdding, setIsAdding] = useState(false);
 
     const handleSubmit = async (e) => {
         e.preventDefault();
-        
+
     };
+
+    if (isLoading) {
+        return (
+            <LoadingSpinner />
+        )
+    }
+    if (error) {
+        return (<ErrorPage />)
+    }
 
     if (!isDialogOpen) return null;
 
@@ -34,7 +44,7 @@ const AddProjectMember = ({ isDialogOpen, setIsDialogOpen }) => {
                     </h2>
                     {currentWorkspace && (
                         <p className="text-sm text-zinc-700 dark:text-zinc-400">
-                            Adding to Project: <span className="text-blue-600 dark:text-blue-400">{project.name}</span>
+                            Adding to Project: <span className="text-blue-600 dark:text-blue-400">{project.title}</span>
                         </p>
                     )}
                 </div>
@@ -51,7 +61,7 @@ const AddProjectMember = ({ isDialogOpen, setIsDialogOpen }) => {
                             {/* List All non project members from current workspace */}
                             <select value={email} onChange={(e) => setEmail(e.target.value)} className="pl-10 mt-1 w-full rounded border border-zinc-300 dark:border-zinc-700 dark:bg-zinc-900 text-zinc-900 dark:text-zinc-200 text-sm placeholder-zinc-400 dark:placeholder-zinc-500 py-2 focus:outline-none focus:border-blue-500" required >
                                 <option value="">Select a member</option>
-                                {currentWorkspace?.members
+                                {currentWorkspace?.workspaceUsers
                                     .filter((member) => !projectMembersEmails.includes(member.user.email))
                                     .map((member) => (
                                         <option key={member.user.id} value={member.user.email}> {member.user.email} </option>

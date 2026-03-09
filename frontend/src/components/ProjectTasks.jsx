@@ -3,7 +3,7 @@ import toast from "react-hot-toast";
 import { useDispatch } from "react-redux";
 import { useState, useMemo } from "react";
 import { useNavigate } from "react-router-dom";
-import { deleteTask, updateTask } from "../features/workspaceSlice";
+import {  useDeleteTaskMutation, useUpdateTaskMutation } from "../features/workspaceSlice";
 import { Bug, CalendarIcon, GitCommit, MessageSquare, Square, Trash, XIcon, Zap } from "lucide-react";
 
 const typeIcons = {
@@ -24,6 +24,10 @@ const ProjectTasks = ({ tasks }) => {
     const dispatch = useDispatch();
     const navigate = useNavigate();
     const [selectedTasks, setSelectedTasks] = useState([]);
+
+    const [updateTask,] = useUpdateTaskMutation();
+
+    const [deleteTask, ] = useDeleteTaskMutation();
 
     const [filters, setFilters] = useState({
         status: "",
@@ -69,6 +73,7 @@ const ProjectTasks = ({ tasks }) => {
             toast.success("Task status updated successfully");
         } catch (error) {
             toast.dismissAll();
+            console.log(error)
             toast.error(error?.response?.data?.message || error.message);
         }
     };

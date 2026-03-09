@@ -1,23 +1,22 @@
 import { useRef } from "react";
-import { useSelector, useDispatch } from "react-redux";
 import { useForm } from "react-hook-form";
 import { useNavigate } from 'react-router-dom'
-import { createWorkspace, updateCreateWorkspaceResponse } from "../features/workspaceSlice";
-import SuccessModal from './SuccessModal.jsx'
+import {  useCreateWorkspaceMutation } from "../features/workspaceSlice";
+import LoadingSpinner from "./LoadingSpinner";
+import SuccessModal from "./SuccessModal";
+import ErrorPage from "./ErrorPage";
 
 
 export default function CreateWorkspaceForm() {
 
   const formRef = useRef(null);
-  const dispatch = useDispatch();
   const navigate = useNavigate();
   const { register, handleSubmit, reset, formState: { errors } } = useForm()
-  const { authResponse, error } = useSelector((store) => store.auth);
-  const { response } = useSelector((store) => store.workspace);
+  const [createWorkspace, { isLoading, isSuccess, isError, error }] = useCreateWorkspaceMutation();
 
 
   const onSubmit = (data) => {
-    dispatch(createWorkspace({ ...data, createdBy: authResponse.username, adminEmail: authResponse.email }))
+    createWorkspace(data)
   };
 
   const handleClick = () => {
@@ -25,15 +24,25 @@ export default function CreateWorkspaceForm() {
       workspaceName: '',
       description: '',
     });
-    dispatch(updateCreateWorkspaceResponse())
     setTimeout(()=>{
-      navigate('/app/user-workspace');
+      navigate('/app');
     })
   }
 
-  if (response.createWorkspaceResponse?.success) {
-    return <SuccessModal message={"Your Workspace created Successfully."} handleClick={handleClick} />
-  }
+    if (isLoading) {
+        return (
+            <LoadingSpinner />
+        )
+    }
+    if (isSuccess) {
+        return (
+            <SuccessModal handleClick={handleClick} message={"Your Workspace is created successfully.."} />
+        )
+    }
+
+     if (isError) {
+       return(<ErrorPage />)
+    }
 
 
   return (
@@ -51,8 +60,7 @@ export default function CreateWorkspaceForm() {
         className="mt-6 grid grid-cols-1 gap-4"
         ref={formRef}
       >
-        <p className={`text-red-500 ${response.createWorkspaceResponse.success ? 'hidden' : ''}`}>{!response.createWorkspaceResponse.success ? response.createWorkspaceResponse.message : ''}</p>
-        <p className={`text-red-500 ${error.createWorkspaceError ? '' : 'hidden'}`}>{error.createWorkspaceError ? error.createWorkspaceError : ''}</p>
+       <p className={`text-red-500 ${error?.data ? '' : 'hidden'}`}>{error?.data ? error?.data?.message : ''}</p>
         <div className="md:col-span-2">
           <label className="text-sm text-gray-600">Workspace Name</label>
           <input

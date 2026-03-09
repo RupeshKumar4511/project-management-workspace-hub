@@ -1,31 +1,37 @@
 import { useRef } from "react";
 import { useForm } from "react-hook-form";
-import { joinWorkspace, updateJoinWorkspaceResponse } from "../features/workspaceSlice";
-import { useDispatch, useSelector } from "react-redux";
+import { useJoinWorkspaceMutation } from "../features/workspaceSlice";
 import { useNavigate } from "react-router-dom";
+import LoadingSpinner from "./LoadingSpinner";
+import ErrorPage from "./ErrorPage";
 
 
 export default function WorkspaceList() {
   const formRef = useRef(null);
   const { register, handleSubmit, reset, formState: { errors } } = useForm();
   const navigate = useNavigate()
-  const dispatch = useDispatch()
-  const { response,error } = useSelector((store) => store.workspace);
+  const [joinWorkspace, { isLoading, isSuccess, isError,error }] = useJoinWorkspaceMutation();
 
   const onSubmit = (data) => {
-    dispatch(joinWorkspace(data));
+    joinWorkspace(data);
   };
 
-  if(response.joinWorkspaceResponse.success){
+
+  if (isLoading) {
+    return (
+      <LoadingSpinner />
+    )
+  }
+  if (isSuccess) {
     reset({
       workspaceName: '',
-      workspacePassword: '',
-
     })
-    dispatch(updateJoinWorkspaceResponse())
-    setTimeout(()=>{
+    setTimeout(() => {
       navigate('/app/workspace');
-    },10)
+    }, 1000)
+  }
+  if (isError) {
+    return (<ErrorPage />)
   }
 
   return (
@@ -38,8 +44,7 @@ export default function WorkspaceList() {
 
         <form className="space-y-5" onSubmit={handleSubmit(onSubmit)} ref={formRef}>
 
-          <p className={`text-red-500 ${response.joinWorkspaceResponse.success?'hidden':''}`}>{!response.joinWorkspaceResponse.success?response.joinWorkspaceResponse.message:''}</p>
-          <p className={`text-red-500 ${error.joinWorkspaceError?'':'hidden'}`}>{error.joinWorkspaceError?error.joinWorkspaceError:''}</p>
+           <p className={`text-red-500 ${error?.data ? '' : 'hidden'}`}>{error?.data ? error?.data?.message : ''}</p>
           <div>
             <label className="block text-sm font-medium text-gray-600 mb-1">
               Organization/Workspace Name

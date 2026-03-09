@@ -1,17 +1,27 @@
-import { useSelector } from "react-redux";
+import { useGetWorkspaceDetailsQuery } from "../features/workspaceSlice";
+import LoadingSpinner from "./LoadingSpinner";
+import ErrorPage from "./ErrorPage";
 
 function WorkspaceDropdown() {
 
-    const currentWorkspace = useSelector((state) => state.workspace?.currentWorkspace || null);
+    const { data: currentWorkspace, isLoading, error } = useGetWorkspaceDetailsQuery();
 
+    if (isLoading) {
+        return (
+            <LoadingSpinner />
+        )
+    }
+
+    if (error) {
+        return (<ErrorPage />)
+    }
     return (
         <div className="relative m-4" >
-            <button  className="w-full flex items-center justify-between p-3 h-auto text-left rounded hover:bg-gray-100 dark:hover:bg-zinc-800" >
+            <button className="w-full flex items-center justify-between p-3 h-auto text-left rounded hover:bg-gray-100 dark:hover:bg-zinc-800" >
                 <div className="flex items-center gap-3">
-                    <img src={currentWorkspace?.image_url} alt={currentWorkspace?.name} className="w-8 h-8 rounded shadow" />
                     <div className="min-w-0 flex-1">
                         <p className="font-semibold text-gray-800 dark:text-white text-sm truncate">
-                            {currentWorkspace?.name || "Select Workspace"}
+                            {currentWorkspace?.details.name || "Select Workspace"}
                         </p>
                     </div>
                 </div>
